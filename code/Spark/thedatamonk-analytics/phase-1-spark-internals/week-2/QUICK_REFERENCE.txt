@@ -1,0 +1,315 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                   WEEK 2: SPARK CORE CONCEPTS - QUICK REFERENCE                ║
+║                         (Print-friendly Cheat Sheet)                            ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. RDD FUNDAMENTALS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 What is RDD?
+   Resilient Distributed Dataset
+   └─ Immutable, distributed collection of objects processed in parallel
+
+🎯 5 Core Properties:
+   1. Partitions      → List of partitions RDD is divided into
+   2. Dependencies    → List of parent RDDs (lineage)
+   3. Compute         → Function to compute from parents
+   4. Partitioner     → Partitioning scheme metadata
+   5. Preferred Loc.  → Data locality hints for scheduling
+
+🔄 Lineage & Fault Tolerance:
+   • Every RDD knows its parent RDDs → forms DAG
+   • If partition lost → Spark recomputes from parent
+   • Uses immutability + lineage for recovery (no copy overhead!)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. LAZY EVALUATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 Core Concept:
+   rdd.map(...)    → NO execution (lazy!)
+   rdd.filter(...) → NO execution (lazy!)
+   rdd.collect()   → NOW everything executes! (action)
+
+✨ Why This Matters:
+   ✓ Spark optimizes entire pipeline before execution
+   ✓ Can reorder operations for better performance
+   ✓ Reduces unnecessary intermediate data
+   ✓ Enables intelligent resource allocation
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. TRANSFORMATIONS vs ACTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚡ TRANSFORMATIONS (Lazy - Don't execute immediately)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NARROW (No shuffle within partition):
+├─ map(f)              → Apply function to each element
+├─ filter(f)           → Keep where f returns True
+├─ flatMap(f)          → Map then flatten results
+└─ union(other)        → Combine RDDs
+
+WIDE (Require shuffle across partitions):
+├─ reduceByKey(f)      → Aggregate by key ⚠️ SHUFFLE!
+├─ groupByKey()        → Group values by key ⚠️ SHUFFLE!
+├─ sortByKey()         → Sort by key ⚠️ SHUFFLE!
+├─ join(other)         → Inner join ⚠️ SHUFFLE!
+├─ leftOuterJoin()     → Left join ⚠️ SHUFFLE!
+├─ distinct()          → Remove duplicates ⚠️ SHUFFLE!
+└─ repartition(n)      → Change partition count ⚠️ SHUFFLE!
+
+✅ ACTIONS (Execute immediately - Trigger computation)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+├─ collect()           → Return all to driver memory (⚠️ Risk OOM!)
+├─ count()             → Number of elements (safe)
+├─ first()             → First element (safe)
+├─ take(n)             → First n elements (safe if n small)
+├─ sum()               → Sum of all elements (safe)
+├─ min() / max()       → Min/max values (safe)
+├─ saveAsTextFile()    → Write to HDFS (safe)
+├─ reduce(f)           → Aggregate all (safe)
+└─ foreach(f)          → Apply function to each (safe)
+
+❌ DON'T: result = huge_rdd.collect()  # Loads ALL data to driver = OOM!
+✅ DO:    result = huge_rdd.take(1000)  # Take only what you need
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. NARROW vs WIDE DEPENDENCIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Aspect              │ NARROW              │ WIDE
+────────────────────┼─────────────────────┼─────────────────────
+Data Movement       │ None (local)        │ Across network (SHUFFLE!)
+Performance         │ Fast                │ Slow ⚠️
+Examples            │ map, filter, flatMap│ reduceByKey, join, groupBy
+Fault Recovery      │ Fast                │ Slow ⚠️
+Stage Boundary      │ No (same stage)     │ Yes (new stage)
+Network I/O         │ No                  │ Yes (all-to-all)
+
+💡 KEY INSIGHT:
+   Narrow: 1 input partition → 1 output partition (no data movement)
+   Wide:   N input partitions → M output partitions (data shuffled!)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. PARTITIONING STRATEGY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 Rule of Thumb:
+   num_partitions = num_cores × 2 to 4
+   (If cluster has 8 cores → 16-32 partitions is optimal)
+
+⚠️ Problem Matrix:
+   ┌─────────────────────┬──────────────────┬─────────────────────┐
+   │  Too Few            │   Too Many       │    Optimal          │
+   ├─────────────────────┼──────────────────┼─────────────────────┤
+   │ Underutilized cores │ Task overhead    │ Balanced resources  │
+   │ Risk of OOM         │ More files       │ Good distribution   │
+   │ Slower processing   │ Shuffle overhead │ Better throughput   │
+   └─────────────────────┴──────────────────┴─────────────────────┘
+
+📊 Partitioner Types:
+   1. HashPartitioner     → hash(key) % n_partitions (random distribution)
+   2. RangePartitioner    → Ranges [0-100], [101-200]... (sorted data)
+   3. Custom Partitioner  → Override partition(key) for domain logic
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. SHUFFLES & WIDE TRANSFORMATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 What is a Shuffle?
+   Network communication where data moves between partitions
+   → All-to-all communication pattern
+   → Very expensive (disk I/O + network transfer)
+
+⚠️ Operations That Trigger Shuffles:
+   • reduceByKey()   → Groups same keys together
+   • groupByKey()    → Groups values by key
+   • sortByKey()     → Sorts by key
+   • join()          → Matches keys across RDDs
+   • distinct()      → Removes duplicates
+   • repartition()   → Changes partition count
+
+✨ Optimization:
+   ❌ grouped = rdd.groupByKey()
+      summed = grouped.map(lambda kv: (kv[0], sum(kv[1])))
+      → Inefficient! Two shuffles + memory overhead
+
+   ✅ summed = rdd.reduceByKey(lambda x, y: x + y)
+      → Efficient! Local reduction first, then single shuffle
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. CACHING & PERSISTENCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 When to Cache:
+   If an RDD is used MULTIPLE times → cache it!
+
+Code Example:
+   filtered = rdd.filter(lambda x: x > 5).cache()
+
+   count = filtered.count()      # Computes and caches
+   avg = filtered.sum() / count  # Uses cache (fast!)
+
+📊 Storage Levels:
+   Level                    │ Memory │ Disk │ CPU  │ Use Case
+   ─────────────────────────┼────────┼──────┼──────┼──────────────────
+   MEMORY_ONLY              │   ✓    │  ✗   │ Low  │ Fits in memory
+   MEMORY_AND_DISK          │   ✓    │  ✓   │ Low  │ May spill to disk
+   DISK_ONLY                │   ✗    │  ✓   │ Med  │ Large data
+   MEMORY_ONLY_2            │   ✓    │  ✗   │ Low  │ Replicated (fault-tolerant)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. PERFORMANCE OPTIMIZATION TECHNIQUES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 Key Bottlenecks:
+   1. Shuffles       → Network I/O (minimize wide transformations)
+   2. Skew           → Some partitions take much longer
+   3. Memory         → OOM from large partitions or collect()
+   4. Serialization  → Slow serialization format
+
+⚙️ Solutions:
+   Problem               │ Solution
+   ──────────────────────┼──────────────────────────────────────
+   Too many shuffles     │ Combine transforms, use reduceByKey
+   Skewed data           │ Salting, isolation, custom partitioner
+   Reusing RDD           │ Cache with .cache()
+   Memory pressure       │ Increase partitions, decrease batch size
+   Slow serialization    │ Use Kryo serializer
+   OOM on collect()      │ Use take(n) or save to disk
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9. L5 INTERVIEW QUESTION SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Q1: FAULT TOLERANCE ARCHITECTURE
+   Topic: How does Spark recover from executor crashes?
+   Answer: RDD lineage → DAG recomputation → reuse parent data
+   Key Points: Heartbeat detection, task rescheduling, data locality
+   Time: 8-10 minutes to explain fully
+
+Q2: PERFORMANCE DESIGN (100GB PIPELINE)
+   Topic: Filter → deduplicate → collect pipeline design
+   Answer: Partition strategy, take() vs collect(), memory management
+   Key Points: Partition count, repartition, coalesce, cache usage
+   Time: 10-12 minutes to explain fully
+
+Q3: DATA SKEW DIAGNOSIS (30% in one user)
+   Topic: Detect and fix skew in reduceByKey
+   Answer: Salting, isolation, custom partitioners
+   Key Points: Statistics, detection, multiple solutions
+   Time: 12-15 minutes to explain fully
+
+Q4: COMPLEX PIPELINE (500GB + JOIN)
+   Topic: Design clickstream pipeline with join
+   Answer: Broadcast joins, filter pushdown, optimization
+   Key Points: Join types, partition count, coalesce strategy
+   Time: 12-15 minutes to explain fully
+
+Q5: LINEAGE & RECOVERY DEEP DIVE
+   Topic: Narrow vs wide dependencies implications
+   Answer: Stage boundaries, recovery time, shuffle wait
+   Key Points: DAG structure, task dependencies, recovery cost
+   Time: 10-12 minutes to explain fully
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10. COMMON MISTAKES TO AVOID
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ MISTAKE 1: Using collect() on large RDD
+   huge_rdd.collect()  # Loads EVERYTHING to driver memory → OOM!
+
+   ✅ FIX: Use take(), first(), or save to disk
+   huge_rdd.take(1000)
+   huge_rdd.saveAsTextFile("path")
+
+❌ MISTAKE 2: groupByKey before reduction
+   grouped = rdd.groupByKey()
+   result = grouped.map(lambda kv: (kv[0], sum(kv[1])))
+
+   ✅ FIX: Use reduceByKey (optimized with partial aggregation)
+   result = rdd.reduceByKey(lambda x, y: x + y)
+
+❌ MISTAKE 3: Not caching reused RDDs
+   filtered = rdd.filter(...)
+   count = filtered.count()      # Recomputes filter
+   avg = filtered.sum() / count  # Recomputes filter again!
+
+   ✅ FIX: Cache after transformation
+   filtered = rdd.filter(...).cache()
+   count = filtered.count()      # Computes and caches
+   avg = filtered.sum() / count  # Uses cache!
+
+❌ MISTAKE 4: Too few or too many partitions
+   rdd = sc.parallelize(data)  # Default partitions (bad!)
+
+   ✅ FIX: Set optimal partition count
+   rdd = sc.parallelize(data, numPartitions=cores * 2)
+
+❌ MISTAKE 5: Using map instead of mapPartitions for heavy ops
+   rdd.map(heavy_operation)  # Heavy operation per element
+
+   ✅ FIX: Use mapPartitions for partition-level operations
+   rdd.mapPartitions(lambda partition: [heavy_op(x) for x in partition])
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+11. QUICK CODE REFERENCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Create RDD
+rdd = sc.parallelize([1,2,3,4,5], numPartitions=2)
+rdd = sc.textFile("path/to/file")
+
+# Transformations (lazy)
+rdd.map(lambda x: x * 2)
+rdd.filter(lambda x: x > 5)
+rdd.flatMap(lambda x: [x, x*2])
+rdd.reduceByKey(lambda x,y: x+y)
+rdd.groupByKey()
+rdd.join(other_rdd)
+rdd.repartition(10)
+rdd.coalesce(5)
+
+# Caching
+rdd.cache()
+rdd.persist(StorageLevel.MEMORY_AND_DISK)
+rdd.unpersist()
+
+# Actions (execute!)
+rdd.collect()
+rdd.count()
+rdd.first()
+rdd.take(10)
+rdd.sum()
+rdd.saveAsTextFile("path")
+
+# Diagnostics
+rdd.getNumPartitions()
+rdd.toDebugString()
+rdd.mapPartitions(lambda x: [sum(1 for _ in x)]).collect()
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+12. STUDY NOTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Day 1: Read RDD Fundamentals + Lazy Evaluation (1 hour)
+Day 2: Study Transformations vs Actions (1 hour)
+Day 3: Learn Partitioning & Shuffles (1.5 hours)
+Day 4: Study Caching & Performance (1 hour)
+Day 5: Deep dive on 5 L5 questions (2 hours)
+Day 6: Review & Practice scenarios (1 hour)
+Day 7: Mock interview prep (1 hour)
+────────────────────────────────────────────────────────
+Total: ~8 hours of study
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Last Updated: June 2026 | Level: L4-L5 Senior Engineer
+For more details, see WEEK2_COMPLETE_GUIDE.html
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║  Good luck! You're ready for Staff-level Spark interview questions!            ║
+╚════════════════════════════════════════════════════════════════════════════════╝

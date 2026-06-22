@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metrics Platform - System Design One-Pager</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: white;
+            color: #333;
+            line-height: 1.4;
+        }
+        .page {
+            width: 11in;
+            height: 8.5in;
+            margin: 0 auto;
+            padding: 0.5in;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            overflow: hidden;
+        }
+        header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        header h1 { font-size: 1.4em; margin: 0; }
+        header p { font-size: 0.8em; opacity: 0.9; margin: 2px 0 0 0; }
+        .architecture {
+            grid-column: 1 / -1;
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.75em;
+            line-height: 1.3;
+            overflow: hidden;
+        }
+        .layer { margin: 8px 0; }
+        .layer-name {
+            background: #667eea;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.9em;
+            width: fit-content;
+            margin-bottom: 4px;
+        }
+        .component {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 6px;
+            margin: 3px 0;
+            border-radius: 3px;
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 0.85em;
+        }
+        .arrow { color: #ff6b6b; font-weight: bold; }
+        .col { display: inline-block; width: 48%; vertical-align: top; }
+        .col2 { display: inline-block; width: 32%; vertical-align: top; margin-right: 1%; }
+        h3 {
+            color: #667eea;
+            font-size: 0.95em;
+            margin: 10px 0 5px 0;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 3px;
+        }
+        .metrics-box {
+            background: #e7f3ff;
+            border-left: 3px solid #2196F3;
+            padding: 8px;
+            margin: 8px 0;
+            font-size: 0.8em;
+            line-height: 1.3;
+        }
+        .metrics-box strong { color: #1565c0; }
+        .trade-off {
+            background: #fff3cd;
+            border-left: 3px solid #ffc107;
+            padding: 6px;
+            margin: 6px 0;
+            font-size: 0.8em;
+            line-height: 1.3;
+        }
+        table {
+            width: 100%;
+            font-size: 0.8em;
+            margin: 6px 0;
+            border-collapse: collapse;
+        }
+        td { padding: 4px; border-bottom: 1px solid #ddd; }
+        td:first-child { font-weight: bold; color: #667eea; }
+        .flow {
+            background: #f0f4ff;
+            border: 1px dashed #667eea;
+            padding: 8px;
+            margin: 6px 0;
+            font-size: 0.8em;
+            line-height: 1.5;
+            border-radius: 3px;
+        }
+        .cost {
+            background: #e8f5e9;
+            border-left: 3px solid #4caf50;
+            padding: 6px;
+            font-size: 0.8em;
+            margin: 6px 0;
+        }
+        .interview {
+            background: #f3e5f5;
+            border-left: 3px solid #9c27b0;
+            padding: 8px;
+            font-size: 0.8em;
+            line-height: 1.4;
+        }
+        @media print {
+            body { margin: 0; }
+            .page { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header>
+            <h1>🎯 Metrics Platform - System Design</h1>
+            <p>1000+ metrics, 100 concurrent users, <100ms real-time + <500ms historical, 2-year retention</p>
+        </header>
+
+        <div class="architecture">
+            <div class="layer">
+                <div class="layer-name">📱 CLIENTS</div>
+                <div class="component">Dashboard (Real-time)</div>
+                <div class="component">BI Tools (Analytical)</div>
+                <div class="component">Mobile App</div>
+            </div>
+
+            <div style="margin: 4px 0; color: #ff6b6b; font-weight: bold;">↓↓↓</div>
+
+            <div class="layer">
+                <div class="layer-name">🔌 QUERY LAYER</div>
+                <div class="component">Fast API (&lt;100ms)</div>
+                <div class="component">Analytical API (&lt;500ms)</div>
+                <div class="component">GraphQL (batching)</div>
+            </div>
+
+            <div style="margin: 4px 0; color: #ff6b6b; font-weight: bold;">↓↓↓</div>
+
+            <div class="layer">
+                <div class="layer-name">💾 STORAGE (Dual Path)</div>
+                <div style="margin: 5px 0;">
+                    <strong style="color: #667eea;">HOT (7d):</strong>
+                    <div class="component">Redis TimeSeries 350GB</div>
+                    <div class="component">Memcached (Query Cache)</div>
+                    <div class="component">Latency: &lt;5ms</div>
+                </div>
+                <div style="margin: 5px 0;">
+                    <strong style="color: #764ba2;">COLD (2yr):</strong>
+                    <div class="component">Snowflake (Star Schema)</div>
+                    <div class="component">Delta Lake (S3 Parquet)</div>
+                    <div class="component">Latency: &lt;500ms</div>
+                </div>
+                <div style="margin: 5px 0;">
+                    <strong style="color: #ff6b6b;">MATERIALIZED:</strong>
+                    <div class="component">dbt (50 golden metrics)</div>
+                    <div class="component">Hourly + Daily pre-agg</div>
+                </div>
+            </div>
+
+            <div style="margin: 4px 0; color: #ff6b6b; font-weight: bold;">↓↓↓</div>
+
+            <div class="layer">
+                <div class="layer-name">⚙️ COMPUTE LAYER</div>
+                <div style="margin: 5px 0;">
+                    <strong>Real-time Path:</strong>
+                    <div class="component">Flink (15-30s windows)</div>
+                    <div class="component">RocksDB State</div>
+                    <div class="component">Output → Redis (1min flush)</div>
+                </div>
+                <div style="margin: 5px 0;">
+                    <strong>Batch Path:</strong>
+                    <div class="component">Spark (Nightly)</div>
+                    <div class="component">Exactly-once + Late arrivals</div>
+                    <div class="component">Output → Snowflake</div>
+                </div>
+            </div>
+
+            <div style="margin: 4px 0; color: #ff6b6b; font-weight: bold;">↓↓↓</div>
+
+            <div class="layer">
+                <div class="layer-name">🚀 INGESTION LAYER</div>
+                <div class="component">Kafka Cluster (100K evt/min)</div>
+                <div class="component">Partition by metric_id</div>
+                <div class="component">Schema Registry</div>
+                <div class="component">7-day retention (replay)</div>
+            </div>
+
+            <div style="margin: 4px 0; color: #ff6b6b; font-weight: bold;">↓↓↓</div>
+
+            <div class="layer">
+                <div class="layer-name">📊 DATA SOURCES</div>
+                <div class="component">App Events</div>
+                <div class="component">User Tracking</div>
+                <div class="component">Business Systems</div>
+            </div>
+        </div>
+
+        <div>
+            <h3>📈 Performance SLAs</h3>
+            <div class="metrics-box">
+                <strong>Real-time queries:</strong> <100ms (p99)<br>
+                <strong>Analytical queries:</strong> <500ms (p99)<br>
+                <strong>Cache hit rate:</strong> 70%<br>
+                <strong>Event latency:</strong> <2min to dashboard<br>
+                <strong>Hot data retention:</strong> 7 days (Redis)<br>
+                <strong>Cold data retention:</strong> 2 years (Snowflake)
+            </div>
+
+            <h3>🔄 Key Decisions</h3>
+            <table>
+                <tr>
+                    <td style="width: 40%;">Dual Storage</td>
+                    <td>Redis (fast) + Snowflake (scalable)</td>
+                </tr>
+                <tr>
+                    <td>Dual Compute</td>
+                    <td>Flink (low-latency) + Spark (batch correctness)</td>
+                </tr>
+                <tr>
+                    <td>Query APIs</td>
+                    <td>3 paths for 3 access patterns</td>
+                </tr>
+                <tr>
+                    <td>Consistency</td>
+                    <td>Eventual (5min lag) vs. synchronous writes</td>
+                </tr>
+                <tr>
+                    <td>Schema</td>
+                    <td>Registry versioning + replay capability</td>
+                </tr>
+            </table>
+
+            <h3>💰 Cost & Scaling</h3>
+            <div class="cost">
+                <strong>Current (1000 metrics):</strong> ~$22K/mo<br>
+                Kafka: $3K | Flink: $8K | Redis: $5K | Snowflake: $6K<br>
+                <br>
+                <strong>Scale to 5000 metrics:</strong><br>
+                Shift 80% hot data → Snowflake, keep top 200 in Redis<br>
+                Add intermediate hourly Spark layer<br>
+                Linear cost growth to ~$35K/mo
+            </div>
+
+            <h3>⚡ Reliability</h3>
+            <div class="flow">
+                <strong>Exactly-once:</strong> Spark idempotent writes (upsert), Flink checkpointing<br>
+                <strong>Replay:</strong> Kafka 7d retention, re-run Spark with date-range<br>
+                <strong>Quality:</strong> Flink validation + dbt tests + reconciliation alerts<br>
+                <strong>Backfill:</strong> Schema Registry versioning enables re-processing
+            </div>
+        </div>
+
+        <div>
+            <h3>🎯 Trade-offs</h3>
+            <div class="trade-off">
+                <strong>Dual storage:</strong> Complexity vs. meeting both latency SLAs<br>
+                ✓ Can't do <100ms with only Snowflake
+            </div>
+            <div class="trade-off">
+                <strong>Kafka vs Kinesis:</strong> Ops overhead vs. $7K/mo savings<br>
+                ✓ K8s auto-scaling + Schema Registry justify cost
+            </div>
+            <div class="trade-off">
+                <strong>Eventual consistency:</strong> 5min lag vs. synchronous writes complexity<br>
+                ✓ Nightly reconciliation catches discrepancies
+            </div>
+            <div class="trade-off">
+                <strong>Materialized views:</strong> Forecasting effort vs. 99% query speedup<br>
+                ✓ Top 50 metrics cover 80% of queries
+            </div>
+
+            <h3>📋 Interview Narrative</h3>
+            <div class="interview">
+                "The core challenge: real-time (<100ms) and historical (2yr retention) have conflicting requirements. I use <strong>dual storage</strong>—Redis for 7-day hot data, Snowflake for cold. <strong>Two compute engines</strong>: Flink streams to Redis (15s windows), Spark batch nightly for correctness. <strong>Three query APIs</strong> optimize for different clients. Most queries (70%) hit <strong>cache</strong> because users repeat the same questions.<br><br>
+                Biggest trade-off: <strong>eventual consistency</strong>. Redis and Snowflake lag ~5 minutes. For revenue metrics, I run nightly reconciliation with >1% alerts. It's deliberate: buy latency by accepting eventual consistency.<br><br>
+                At 100 users, 1000 metrics: ~$22K/mo. Scale to 5000 metrics: shift hot data to Snowflake, keep top 200 in Redis."
+            </div>
+
+            <h3>🔍 Expected Follow-ups</h3>
+            <div style="font-size: 0.8em; line-height: 1.5;">
+                ❓ Why not BigQuery alone? → Can't do <100ms cold storage<br>
+                ❓ Schema evolution? → Registry + schema-on-read + backfill<br>
+                ❓ Kafka outage? → App buffers 1hr, fallback to 7d Redis cache<br>
+                ❓ Dual-path testing? → dbt tests + integration tests comparing tail records
+            </div>
+        </div>
+    </div>
+</body>
+</html>

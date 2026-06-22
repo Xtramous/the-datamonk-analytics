@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metrics Platform - Tools Stack & Data Flow</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        header h1 { font-size: 2em; margin-bottom: 10px; }
+        header p { font-size: 1.1em; opacity: 0.95; }
+        .content { padding: 30px; }
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        .stage {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            border-radius: 5px;
+        }
+        .stage h2 {
+            color: #667eea;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stage-number {
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .tool {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+        .tool:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+        .tool-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .tool-category {
+            display: inline-block;
+            background: #e7f3ff;
+            color: #1565c0;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .tool-usecase {
+            color: #555;
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        .tool-details {
+            font-size: 0.85em;
+            color: #888;
+            border-top: 1px solid #eee;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+        .tool-details strong {
+            color: #667eea;
+        }
+        .parallel-label {
+            background: #fff3cd;
+            color: #856404;
+            padding: 8px 15px;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 15px 0;
+            font-weight: 500;
+            border-left: 3px solid #ffc107;
+        }
+        .arrow {
+            text-align: center;
+            font-size: 1.5em;
+            color: #667eea;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .comparison-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        .comparison-table tr:hover {
+            background: #f5f5f5;
+        }
+        .summary-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .summary-box h3 {
+            color: #1565c0;
+            margin-bottom: 10px;
+        }
+        .summary-box ul {
+            margin-left: 20px;
+        }
+        .summary-box li {
+            margin: 8px 0;
+            color: #333;
+        }
+        .flow-diagram {
+            background: #f9f9f9;
+            border: 2px dashed #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.9em;
+            line-height: 1.8;
+            overflow-x: auto;
+            color: #333;
+        }
+        .section-divider {
+            border-top: 3px solid #667eea;
+            margin: 40px 0;
+            padding-top: 30px;
+        }
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+        .color-ingestion { background: #e3f2fd; border: 2px solid #2196F3; }
+        .color-processing { background: #f3e5f5; border: 2px solid #9c27b0; }
+        .color-storage { background: #e8f5e9; border: 2px solid #4caf50; }
+        .color-query { background: #fff3e0; border: 2px solid #ff9800; }
+        .color-ops { background: #ffebee; border: 2px solid #f44336; }
+        footer {
+            background: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔧 Metrics Platform - Complete Tools Stack</h1>
+            <p>Chronological Order | Parallel Flows | Use Cases</p>
+        </header>
+
+        <div class="content">
+            <div class="summary-box">
+                <h3>📊 Platform Overview</h3>
+                <p>Complete technology stack for a scalable metrics platform serving 1000+ metrics to 100 concurrent users with <100ms real-time and <500ms analytical query latency.</p>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color color-ingestion"></div>
+                    <span><strong>Ingestion</strong> - Data Entry</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color color-processing"></div>
+                    <span><strong>Processing</strong> - Stream & Batch</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color color-storage"></div>
+                    <span><strong>Storage</strong> - Hot & Cold</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color color-query"></div>
+                    <span><strong>Query</strong> - API & Cache</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color color-ops"></div>
+                    <span><strong>Operations</strong> - Monitoring & Alerts</span>
+                </div>
+            </div>
+
+            <h2 style="color: #667eea; margin: 30px 0 20px 0; font-size: 1.5em;">⏱️ DATA FLOW & TOOLS (Chronological Order)</h2>
+
+            <!-- STAGE 0: DATA SOURCES -->
+            <div class="stage">
+                <h2>
+                    <div class="stage-number">0</div>
+                    📱 Data Sources (Event Generation)
+                </h2>
+                <p style="margin-bottom: 15px;">Applications and services generate raw events</p>
+
+                <div class="tools-grid">
+                    <div class="tool">
+                        <div class="tool-category">Application Layer</div>
+                        <div class="tool-name">Custom Apps</div>
+                        <div class="tool-usecase">🎯 Generates metric events (100K/min): pageviews, clicks, revenue, user actions</div>
+                        <div class="tool-details">
+                            <strong>Language:</strong> Any (Python, Go, Node, Java)<br/>
+                            <strong>Protocol:</strong> HTTP/gRPC to Kafka
+                        </div>
+                    </div>
+                    <div class="tool">
+                        <div class="tool-category">Analytics SDK</div>
+                        <div class="tool-name">Analytics SDKs</div>
+                        <div class="tool-usecase">🎯 Lightweight client libraries in apps to emit events with dimensions (region, product, user_id)</div>
+                        <div class="tool-details">
+                            <strong>Format:</strong> JSON events<br/>
+                            <strong>Batching:</strong> 100ms or 100 events
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow">↓↓↓</div>
+            </div>
+
+            <!-- STAGE 1: INGESTION -->
+            <div class="stage" style="border-left-color: #2196F3; background: linear-gradient(to right, #f9f9fa 0%, #e3f2fd 100%);">
+                <h2>
+                    <div class="stage-number" style="background: #2196F3;">1</div>
+                    🚀 Ingestion Layer (Event Streaming)
+                </h2>
+                <p style="margin-bottom: 15px;">Centralized event collection, validation, and retention</p>
+
+                <div class="tools-grid">
+                    <div class="tool">
+                        <div class="tool-category">Message Broker</div>
+                        <div class="tool-name">Apache Kafka</div>
+                        <div class="tool-usecase">🎯 Distributed message queue handling 100K events/min, partitioned by metric_id (isolate hot/cold metrics)</div>
+                        <div class="tool-details">
+                            <strong>Partitioning:</strong> metric_id key<br/>
+                            <strong>Retention:</strong> 7 days (enable replay)<br/>
+                            <strong>Replication:</strong> 3x (HA)<br/>
+                            <strong>Cost:</strong> $3K/month
+                        </div>
+                    </div>
+                    <div class="tool">
+                        <div class="tool-category">Schema Registry</div>
+                        <div class="tool-name">Confluent Schema Registry</div>
+                        <div class="tool-usecase">🎯 Enforces schema contract between producers/consumers, versioning for metric schema evolution</div>
+                        <div class="tool-details">
+                            <strong>Format:</strong> Avro/Protobuf<br/>
+                            <strong>Validation:</strong> Producer/consumer compatibility checks<br/>
+                            <strong>Version Control:</strong> Enable replay with old schemas
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow">↓↓↓</div>
+            </div>
+
+            <!-- STAGE 2: PROCESSING (PARALLEL) -->
+            <div class="section-divider"></div>
+            <div class="parallel-label">⚡ PARALLEL PROCESSING PATHS (From this point onward)</div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                <!-- LEFT: REAL-TIME PATH -->
+                <div style="border-right: 3px dashed #667eea; padding-right: 20px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🟢 REAL-TIME PATH (Stream Processing)</h3>
+                    <p style="margin-bottom: 15px; color: #666;">Low-latency aggregation for dashboards (1-2 min to display)</p>
+
+                    <div class="stage" style="border-left-color: #9c27b0; background: linear-gradient(to right, #f9f9fa 0%, #f3e5f5 100%);">
+                        <h2>
+                            <div class="stage-number" style="background: #9c27b0;">2A</div>
+                            ⚙️ Stream Processing Engine
+                        </h2>
+
+                        <div class="tools-grid">
+                            <div class="tool">
+                                <div class="tool-category">Stream Processor</div>
+                                <div class="tool-name">Apache Flink</div>
+                                <div class="tool-usecase">🎯 Real-time aggregation: 15-30 second tumbling windows, SUM/COUNT/PERCENTILES (p50, p95, p99)</div>
+                                <div class="tool-details">
+                                    <strong>Windows:</strong> 15-30 seconds<br/>
+                                    <strong>State:</strong> RocksDB (fault-tolerant KV store)<br/>
+                                    <strong>Output:</strong> Flush to Redis every 1 minute<br/>
+                                    <strong>Cost:</strong> $8K/month (8-12 task managers)
+                                </div>
+                            </div>
+                            <div class="tool">
+                                <div class="tool-category">State Backend</div>
+                                <div class="tool-name">RocksDB</div>
+                                <div class="tool-usecase">🎯 Embedded KV store for Flink state (aggregation results), survives restarts via incremental checkpoints</div>
+                                <div class="tool-details">
+                                    <strong>Embedded in Flink:</strong> No separate deployment<br/>
+                                    <strong>Checkpointing:</strong> Incremental (faster recovery)<br/>
+                                    <strong>Backend:</strong> Local SSD or HDFS
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="arrow">↓</div>
+
+                        <div class="stage" style="border-left-color: #4caf50; background: linear-gradient(to right, #f9f9fa 0%, #e8f5e9 100%);">
+                            <h2>
+                                <div class="stage-number" style="background: #4caf50; font-size: 0.9em;">2A-S</div>
+                                💾 Hot Storage (Real-time)
+                            </h2>
+
+                            <div class="tools-grid">
+                                <div class="tool">
+                                    <div class="tool-category">Time-Series Cache</div>
+                                    <div class="tool-name">Redis TimeSeries</div>
+                                    <div class="tool-usecase">🎯 In-memory time-series data (7 days), <5ms reads for real-time dashboards, auto-expire after 7 days</div>
+                                    <div class="tool-details">
+                                        <strong>Capacity:</strong> 350-500GB on-disk<br/>
+                                        <strong>Latency:</strong> &lt;5ms<br/>
+                                        <strong>Key Format:</strong> metric:{id}:{dim1=val1}:{dim2=val2}:{ts}<br/>
+                                        <strong>TTL:</strong> 7 days auto-expiry<br/>
+                                        <strong>Cost:</strong> $5K/month
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: BATCH PATH -->
+                <div style="padding-left: 20px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🔵 BATCH PATH (Correctness)</h3>
+                    <p style="margin-bottom: 15px; color: #666;">Full-day re-aggregation for historical accuracy (nightly)</p>
+
+                    <div class="stage" style="border-left-color: #9c27b0; background: linear-gradient(to right, #f9f9fa 0%, #f3e5f5 100%);">
+                        <h2>
+                            <div class="stage-number" style="background: #9c27b0;">2B</div>
+                            ⚙️ Batch Processing Engine
+                        </h2>
+
+                        <div class="tools-grid">
+                            <div class="tool">
+                                <div class="tool-category">Batch Processor</div>
+                                <div class="tool-name">Apache Spark</div>
+                                <div class="tool-usecase">🎯 Nightly batch: full day's Kafka events, 24-hour late-arrival dedup window, exactly-once semantics for revenue metrics</div>
+                                <div class="tool-details">
+                                    <strong>Schedule:</strong> Nightly (2 AM UTC)<br/>
+                                    <strong>Late Window:</strong> 24 hours<br/>
+                                    <strong>Writes:</strong> Idempotent (UPSERT)<br/>
+                                    <strong>Output:</strong> Snowflake fact tables<br/>
+                                    <strong>Language:</strong> PySpark/Scala
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="arrow">↓</div>
+
+                        <div class="stage" style="border-left-color: #4caf50; background: linear-gradient(to right, #f9f9fa 0%, #e8f5e9 100%);">
+                            <h2>
+                                <div class="stage-number" style="background: #4caf50; font-size: 0.9em;">2B-S</div>
+                                💾 Cold Storage (Batch)
+                            </h2>
+
+                            <div class="tools-grid">
+                                <div class="tool">
+                                    <div class="tool-category">Data Warehouse</div>
+                                    <div class="tool-name">Snowflake</div>
+                                    <div class="tool-usecase">🎯 2-year historical data, star schema (metrics_fact + dimensions), <500ms analytical queries, vectorized execution</div>
+                                    <div class="tool-details">
+                                        <strong>Schema:</strong> Star (fact + dim tables)<br/>
+                                        <strong>Partitioning:</strong> By date, nested by metric_id<br/>
+                                        <strong>Format:</strong> Native Snowflake<br/>
+                                        <strong>Cost:</strong> $6K/month (2 XL clusters, auto-suspend off-peak)
+                                    </div>
+                                </div>
+                                <div class="tool">
+                                    <div class="tool-category">Columnar Format</div>
+                                    <div class="tool-name">Parquet + Snappy</div>
+                                    <div class="tool-usecase">🎯 Compressed columnar format for S3 archives (10:1 ratio), enables Delta Lake ACID transactions</div>
+                                    <div class="tool-details">
+                                        <strong>Compression:</strong> 10:1 ratio<br/>
+                                        <strong>Storage:</strong> S3<br/>
+                                        <strong>Format:</strong> Delta Lake for ACID
+                                    </div>
+                                </div>
+                                <div class="tool">
+                                    <div class="tool-category">Archive Storage</div>
+                                    <div class="tool-name">AWS S3 + Glacier</div>
+                                    <div class="tool-usecase">🎯 Long-term storage: S3 for 90 days (warm), Glacier for 2+ years (cold archive, rarely accessed)</div>
+                                    <div class="tool-details">
+                                        <strong>Tiering:</strong> S3 → Glacier after 90 days<br/>
+                                        <strong>Cost:</strong> $0.01/GB/month (Glacier)<br/>
+                                        <strong>Retention:</strong> 2+ years
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STAGE 3: MATERIALIZED VIEWS -->
+            <div class="stage" style="border-left-color: #ff9800; background: linear-gradient(to right, #f9f9fa 0%, #fff3e0 100%);">
+                <h2>
+                    <div class="stage-number" style="background: #ff9800;">3</div>
+                    📊 Data Transformation & Pre-Aggregation
+                </h2>
+                <p style="margin-bottom: 15px;">Pre-compute golden metrics for instant query response</p>
+
+                <div class="tools-grid">
+                    <div class="tool">
+                        <div class="tool-category">Transform Tool</div>
+                        <div class="tool-name">dbt (data build tool)</div>
+                        <div class="tool-usecase">🎯 SQL-based transformations: pre-aggregate 50 golden metrics (revenue, orders, margin, CSAT) at hourly & daily granularity</div>
+                        <div class="tool-details">
+                            <strong>Schedule:</strong> Nightly (after Spark batch)<br/>
+                            <strong>Tests:</strong> Null counts, freshness, relationships<br/>
+                            <strong>Output:</strong> Snowflake native tables<br/>
+                            <strong>Language:</strong> Jinja2 + SQL
+                        </div>
+                    </div>
+                    <div class="tool">
+                        <div class="tool-category">Version Control</div>
+                        <div class="tool-name">Git (GitHub/GitLab)</div>
+                        <div class="tool-usecase">🎯 Version control for dbt models, SQL transformations, schema documentation, reproducible analytics</div>
+                        <div class="tool-details">
+                            <strong>Repo:</strong> dbt models + tests<br/>
+                            <strong>CI/CD:</strong> dbt Cloud or GitHub Actions<br/>
+                            <strong>Lineage:</strong> Automatic tracking
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow">↓↓↓</div>
+            </div>
+
+            <!-- STAGE 4: CACHING -->
+            <div class="stage" style="border-left-color: #ff9800; background: linear-gradient(to right, #f9f9fa 0%, #fff3e0 100%);">
+                <h2>
+                    <div class="stage-number" style="background: #ff9800;">4</div>
+                    ⚡ Multi-Layer Caching
+                </h2>
+                <p style="margin-bottom: 15px;">Query result caching for 70% hit rate on repeated queries</p>
+
+                <div class="tools-grid">
+                    <div class="tool">
+                        <div class="tool-category">Query Cache</div>
+                        <div class="tool-name">Memcached</div>
+                        <div class="tool-usecase">🎯 Query result cache: caches full query responses (5min TTL), 70% hit rate (users repeat same metric slices)</div>
+                        <div class="tool-details">
+                            <strong>TTL:</strong> 5 minutes<br/>
+                            <strong>Hit Rate:</strong> 70%<br/>
+                            <strong>Key Format:</strong> hash(metric_id+dims+range)<br/>
+                            <strong>Invalidation:</strong> Event-driven on Flink flush
+                        </div>
+                    </div>
+                    <div class="tool">
+                        <div class="tool-category">Hot Data Cache</div>
+                        <div class="tool-name">Redis (as cache)</div>
+                        <div class="tool-usecase">🎯 Dual duty: both hot storage (7d retention) AND distributed cache for architectural efficiency</div>
+                        <div class="tool-details">
+                            <strong>TTL:</strong> 7 days (data)<br/>
+                            <strong>Operations:</strong> GET, SET, EXPIRE<br/>
+                            <strong>Invalidation:</strong> Check invalidation log on query
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow">↓↓↓</div>
+            </div>
+
+            <!-- STAGE 5: QUERY APIs -->
+            <div class="stage" style="border-left-color: #ff9800; background: linear-gradient(to right, #f9f9fa 0%, #fff3e0 100%);">
+                <h2>
+                    <div class="stage-number" style="background: #ff9800;">5</div>
+                    🔌 Query APIs
+                </h2>
+                <p style="margin-bottom: 15px;">Three APIs optimized for different client needs</p>
+
+                <div class="tools-grid">
+                    <div class="tool">
+                        <div class="tool-category">REST API</div>
+                        <div class="tool-name">FastAPI / Flask</div>
+                        <div class="tool-usecase">🎯 Fast Query API (&lt;100ms): GET /metrics/{id}?dimensions=x,y&time_range=7d → hits Redis directly</div>
+                        <div class="tool-details">
+                            <strong>Framework:</strong> FastAPI (async Python)<br/>
+                            <strong>Response:</strong> JSON<br/>
+                            <strong>SLA:</strong> &lt;100ms p99<br/>
+                            <strong>Cache:</strong> Memcached layer
+                        </div>
+                    </div>
+                    <div class="tool">
+                        <div class="tool-category">SQL API</div>
+                        <div class="tool-name">Analytical Query Service</div>
+                        <div class="tool-usecase">🎯 Analytical API (&lt;500ms): POST /query with complex filters/joins → routes to Snowflake cold path</div>
+                        <div class="tool-details">
+                            <strong>Query Builder:</strong> Parse JSON → Snowflake SQL<br/>
+                            <strong>Optimizer:</strong> Detect filter selectivity<br/>
+                            <strong>SLA:</strong> &lt;500ms p99
+                        </div>
+                    </div>
+                    <div class="tool">
+                        <div class="tool-category">GraphQL API</div>
+                        <div class="tool-name">GraphQL Server</div>
+                        <div class="tool-usecase">🎯 Batching API: combine N independent metric requests into 1 Snowflake query (N calls → 1 query, reduce round-trips)</div>
+                        <div class="tool-details">
+                            <strong>Framework:</strong> Apollo Server<br/>
+                            <strong>Feature:</strong> Field aliasing (revenue_usd → gross_revenue - taxes)<br/>
+                            <strong>Batching:</strong> DataLoader pattern
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow">↓↓↓</div>
+            </div>
+
+            <!-- STAGE 6: CLIENTS -->
+            <div class="stage">
+                <h2>
+                    <div class="stage-number">6</div>
+                    📱 Client Applications
+                </h2>
+                <p style="margin-bottom: 15px;">Consumers of the metrics platform</p>
+
+                <div class="tools-grid">
+                    <div class="tool">
+                        <div class="tool-category">Dashboard</div>
+                        <div class="tool-name">React / Vue.js Frontend</div>
+                        <div class="tool-usecase">🎯 Real-time dashboard: calls Fast Query API, updates every 30-60 seconds, sub-100ms latency</div>
+                        <div class="tool-details">
+                            <strong>Framework:</strong> React + Redux<br/>
+                            <strong>Polling:</strong> 30-60 second interval<br/>
+                            <strong>Charts:</strong> Plotly/Recharts
+                        </div>
+                    </div>
+                    <div class="tool">
+                        <div class="tool-category">BI Tool</div>
+                        <div class="tool-name">Tableau / Looker / Power BI</div>
+                        <div class="tool-usecase">🎯 Business Intelligence: calls GraphQL API for batched queries, pre-fetches reports for explorer views</div>
+                        <div class="tool-details">
+                            <strong>Connector:</strong> Custom GraphQL datasource<br/>
+                            <strong>Refresh:</strong> Hourly or on-demand<br/>
+                            <strong>Latency:</strong> &lt;500ms acceptable
+                        </div>
+                    </div>
+                    <div class="tool">
+                        <div class="tool-category">ML Pipeline</div>
+                        <div class="tool-name">Python Scripts / Notebooks</div>
+                        <div class="tool-usecase">🎯 Offline analytics: pulls historical data from Snowflake cold path for model training, backtesting</div>
+                        <div class="tool-details">
+                            <strong>Access:</strong> Direct Snowflake connection<br/>
+                            <strong>Format:</strong> Parquet / CSV<br/>
+                            <strong>Volume:</strong> Full dataset (2 years)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- STAGE 7: OPERATIONS -->
+            <div class="stage" style="border-left-color: #f44336; background: linear-gradient(to right, #f9f9fa 0%, #ffebee 100%);">
+                <h2>
+                    <div class="stage-number" style="background: #f44336;">7</div>
+                    🔍 Monitoring, Alerting & Operations
+                </h2>
+                <p style="margin-bottom: 15px;">System observability and incident response</p>
+
+                <div class="tools-grid">
+                    <div class="tool">
+                        <div class="tool-category">Metrics Collection</div>
+                        <div class="tool-name">Prometheus</div>
+                        <div class="tool-usecase">🎯 Collects system metrics: kafka_consumer_lag, flink_task_failures, redis_memory, snowflake_query_latency</div>
+                        <div class="tool-details">
+                            <strong>Scrape Interval:</strong> 15 seconds<br/>
+                            <strong>Retention:</strong> 15 days<br/>
+                            <strong>Exporters:</strong> Kafka, Flink, Redis, custom
+                        </div>
+                    </div>
+                    <div class="tool">
+                        <div class="tool-category">Visualization</div>
+                        <div class="tool-name">Grafana</div>
+                        <div class="tool-usecase">🎯 Dashboards for system health: data pipeline lag, job failures, resource utilization, query latency percentiles</div>
+                        <div class="tool-details">
+                            <strong>Dashboards:</strong> Flink, Kafka, Redis, Snowflake<br/>
+                            <strong>Alerts:</strong> Pre-configured thresholds<br/>
+                            <strong>Notifications:</strong> Slack, PagerDuty
+                        </div>
+                    </div>
+                    <div class="tool">
+                        <div class="tool-category">Alerting</div>
+                        <div class="tool-name">PagerDuty</div>
+                        <div class="tool-usecase">🎯 Incident alerting: late data >1hr, Kafka down, Snowflake query >2s, Redis memory >90%</div>
+                        <div class="tool-details">
+                            <strong>Escalation:</strong> 5min → 15min → 30min<br/>
+                            <strong>On-call:</strong> Weekly rotation<br/>
+                            <strong>Integration:</strong> Slack + Email
+                        </div>
+                    </div>
+                    <div class="tool">
+                        <div class="tool-category">Log Aggregation</div>
+                        <div class="tool-name">ELK Stack (Elasticsearch)</div>
+                        <div class="tool-usecase">🎯 Centralized logs: Flink/Spark job logs, API errors, slow queries, schema validation failures</div>
+                        <div class="tool-details">
+                            <strong>Aggregator:</strong> Logstash / Fluentd<br/>
+                            <strong>Retention:</strong> 7 days<br/>
+                            <strong>Queries:</strong> Kibana dashboard
+                        </div>
+                    </div>
+                    <div class="tool">
+                        <div class="tool-category">Data Quality</div>
+                        <div class="tool-name">Great Expectations</div>
+                        <div class="tool-usecase">🎯 Data validation: row counts match, null checks, late-arriving data detection, reconciliation alerts</div>
+                        <div class="tool-details">
+                            <strong>Checks:</strong> Pre/post aggregation<br/>
+                            <strong>Execution:</strong> After Spark job<br/>
+                            <strong>Output:</strong> Validation reports
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STAGE 8: ORCHESTRATION & INFRASTRUCTURE -->
+            <div class="stage" style="border-left-color: #673ab7; background: linear-gradient(to right, #f9f9fa 0%, #ede7f6 100%);">
+                <h2>
+                    <div class="stage-number" style="background: #673ab7;">8</div>
+                    ⚙️ Orchestration & Infrastructure
+                </h2>
+                <p style="margin-bottom: 15px;">Job scheduling, resource management, and deployment</p>
+
+                <div class="tools-grid">
+                    <div class="tool">
+                        <div class="tool-category">Orchestration</div>
+                        <div class="tool-name">Kubernetes (K8s)</div>
+                        <div class="tool-usecase">🎯 Container orchestration: manages Flink/Spark/API pods, auto-scales on kafka_consumer_lag, handles failovers</div>
+                        <div class="tool-details">
+                            <strong>Deployment:</strong> Helm charts<br/>
+                            <strong>Auto-scaling:</strong> HPA on custom metrics<br/>
+                            <strong>Service Mesh:</strong> Istio (optional, for latency SLOs)
+                        </div>
+                    </div>
+                    <div class="tool">
+                        <div class="tool-category">Job Scheduler</div>
+                        <div class="tool-name">Apache Airflow</div>
+                        <div class="tool-usecase">🎯 DAG-based job scheduling: Spark batch (2 AM), dbt transforms (3 AM), data quality checks (4 AM)</div>
+                        <div class="tool-details">
+                            <strong>Schedule:</strong> Cron-based<br/>
+                            <strong>Retries:</strong> 3x with exponential backoff<br/>
+                            <strong>Notifications:</strong> Slack on failure
+                        </div>
+                    </div>
+                    <div class="tool">
+                        <div class="tool-category">Configuration Management</div>
+                        <div class="tool-name">Terraform / Helm</div>
+                        <div class="tool-usecase">🎯 Infrastructure as Code: manages Kafka cluster, Snowflake warehouse, Redis cluster, K8s resources</div>
+                        <div class="tool-details">
+                            <strong>IaC Language:</strong> HCL (Terraform)<br/>
+                            <strong>State Management:</strong> Remote S3 backend<br/>
+                            <strong>Version Control:</strong> Git
+                        </div>
+                    </div>
+                    <div class="tool">
+                        <div class="tool-category">Container Registry</div>
+                        <div class="tool-name">Docker Hub / AWS ECR</div>
+                        <div class="tool-usecase">🎯 Container images: Flink jobmanager, Spark driver/executor, FastAPI service, dbt runner</div>
+                        <div class="tool-details">
+                            <strong>Base Image:</strong> Python 3.9 slim<br/>
+                            <strong>Registry:</strong> ECR (AWS) or Docker Hub<br/>
+                            <strong>Tags:</strong> Semantic versioning
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- SUMMARY TABLE -->
+            <h2 style="color: #667eea; font-size: 1.4em; margin: 30px 0 20px 0;">📋 Complete Tools Summary Table</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Tool</th>
+                        <th>Category</th>
+                        <th>Use Case</th>
+                        <th>Key Metrics</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>Custom Apps</td>
+                        <td>Event Sources</td>
+                        <td>Generate metric events (100K/min)</td>
+                        <td>100K evt/min, JSON format</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Kafka</td>
+                        <td>Ingestion</td>
+                        <td>Message broker, partition by metric_id, 7-day retention</td>
+                        <td>$3K/mo, 3x replication, 7d retention</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Schema Registry</td>
+                        <td>Ingestion</td>
+                        <td>Schema versioning, producer/consumer validation</td>
+                        <td>Avro/Protobuf format, compatibility checks</td>
+                    </tr>
+                    <tr style="background: #f3e5f5;">
+                        <td>2A</td>
+                        <td>Flink</td>
+                        <td>Stream Processing</td>
+                        <td>Real-time: 15-30s windows, RocksDB state, 1min flush</td>
+                        <td>$8K/mo, 8-12 task managers, &lt;2min latency</td>
+                    </tr>
+                    <tr style="background: #f3e5f5;">
+                        <td>2A</td>
+                        <td>RocksDB</td>
+                        <td>State Backend</td>
+                        <td>Embedded KV store for Flink state, survives restarts</td>
+                        <td>Incremental checkpointing, local SSD/HDFS</td>
+                    </tr>
+                    <tr style="background: #e8f5e9;">
+                        <td>2A-S</td>
+                        <td>Redis TimeSeries</td>
+                        <td>Hot Storage</td>
+                        <td>7-day in-memory cache, &lt;5ms reads, auto-TTL</td>
+                        <td>350-500GB capacity, $5K/mo, &lt;5ms latency</td>
+                    </tr>
+                    <tr style="background: #f3e5f5;">
+                        <td>2B</td>
+                        <td>Spark</td>
+                        <td>Batch Processing</td>
+                        <td>Nightly: 24-hour late window, exactly-once, idempotent writes</td>
+                        <td>Nightly 2AM, PySpark/Scala, UPSERT mode</td>
+                    </tr>
+                    <tr style="background: #e8f5e9;">
+                        <td>2B-S</td>
+                        <td>Snowflake</td>
+                        <td>Cold Storage</td>
+                        <td>2-year data warehouse, star schema, &lt;500ms queries</td>
+                        <td>$6K/mo, 2 XL clusters, auto-suspend off-peak</td>
+                    </tr>
+                    <tr style="background: #e8f5e9;">
+                        <td>2B-S</td>
+                        <td>Parquet + Snappy</td>
+                        <td>Columnar Format</td>
+                        <td>Compressed format for S3, 10:1 compression, Delta Lake ACID</td>
+                        <td>10:1 ratio, S3 + Glacier tiering</td>
+                    </tr>
+                    <tr style="background: #e8f5e9;">
+                        <td>2B-S</td>
+                        <td>AWS S3 + Glacier</td>
+                        <td>Archive Storage</td>
+                        <td>Long-term storage: S3 (90d warm), Glacier (2yr cold)</td>
+                        <td>$0.01/GB/mo (Glacier), 2+ year retention</td>
+                    </tr>
+                    <tr style="background: #fff3e0;">
+                        <td>3</td>
+                        <td>dbt</td>
+                        <td>Transformation</td>
+                        <td>SQL-based: pre-agg 50 golden metrics, hourly + daily</td>
+                        <td>Nightly refresh, dbt tests, SQL lineage</td>
+                    </tr>
+                    <tr style="background: #fff3e0;">
+                        <td>3</td>
+                        <td>Git</td>
+                        <td>Version Control</td>
+                        <td>Version control for dbt models, SQL, CI/CD pipelines</td>
+                        <td>GitHub/GitLab, dbt Cloud integration</td>
+                    </tr>
+                    <tr style="background: #fff3e0;">
+                        <td>4</td>
+                        <td>Memcached</td>
+                        <td>Query Cache</td>
+                        <td>Query result cache (5min TTL), 70% hit rate</td>
+                        <td>5min TTL, 70% hit rate, event-driven invalidation</td>
+                    </tr>
+                    <tr style="background: #fff3e0;">
+                        <td>4</td>
+                        <td>Redis (cache)</td>
+                        <td>Distributed Cache</td>
+                        <td>Dual duty: hot storage + cache, 7d retention</td>
+                        <td>Same as hot storage, CHECK on query</td>
+                    </tr>
+                    <tr style="background: #fff3e0;">
+                        <td>5</td>
+                        <td>FastAPI</td>
+                        <td>Query API</td>
+                        <td>Fast Query API: &lt;100ms, hits Redis directly</td>
+                        <td>&lt;100ms SLA p99, Memcached layer</td>
+                    </tr>
+                    <tr style="background: #fff3e0;">
+                        <td>5</td>
+                        <td>Query Service</td>
+                        <td>SQL API</td>
+                        <td>Analytical API: &lt;500ms, routes to Snowflake</td>
+                        <td>&lt;500ms SLA p99, filter selectivity routing</td>
+                    </tr>
+                    <tr style="background: #fff3e0;">
+                        <td>5</td>
+                        <td>GraphQL</td>
+                        <td>Batching API</td>
+                        <td>BI integrations: batch N requests into 1 query</td>
+                        <td>Apollo Server, field aliasing, DataLoader</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>React/Vue.js</td>
+                        <td>Frontend</td>
+                        <td>Real-time dashboard, 30-60s polling</td>
+                        <td>React + Redux, Plotly/Recharts</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Tableau/Looker</td>
+                        <td>BI Tools</td>
+                        <td>Business Intelligence, GraphQL datasource</td>
+                        <td>Custom connector, hourly refresh</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Python Scripts</td>
+                        <td>Offline Analytics</td>
+                        <td>ML pipelines, backtesting, full historical data</td>
+                        <td>Direct Snowflake connection, Parquet/CSV</td>
+                    </tr>
+                    <tr style="background: #ffebee;">
+                        <td>7</td>
+                        <td>Prometheus</td>
+                        <td>Metrics</td>
+                        <td>System metrics: lag, failures, latency, memory</td>
+                        <td>15s scrape, 15d retention, custom exporters</td>
+                    </tr>
+                    <tr style="background: #ffebee;">
+                        <td>7</td>
+                        <td>Grafana</td>
+                        <td>Visualization</td>
+                        <td>System dashboards: pipeline health, resource usage</td>
+                        <td>Pre-configured alerts, Slack/PagerDuty notifications</td>
+                    </tr>
+                    <tr style="background: #ffebee;">
+                        <td>7</td>
+                        <td>PagerDuty</td>
+                        <td>Alerting</td>
+                        <td>Incident management: late data, downtime, errors</td>
+                        <td>5/15/30min escalation, weekly on-call</td>
+                    </tr>
+                    <tr style="background: #ffebee;">
+                        <td>7</td>
+                        <td>ELK Stack</td>
+                        <td>Logging</td>
+                        <td>Centralized logs: job logs, API errors, failures</td>
+                        <td>Logstash aggregator, Kibana dashboard, 7d retention</td>
+                    </tr>
+                    <tr style="background: #ffebee;">
+                        <td>7</td>
+                        <td>Great Expectations</td>
+                        <td>Data Quality</td>
+                        <td>Data validation: row counts, nulls, late arrivals</td>
+                        <td>Pre/post aggregation checks, validation reports</td>
+                    </tr>
+                    <tr style="background: #ede7f6;">
+                        <td>8</td>
+                        <td>Kubernetes</td>
+                        <td>Orchestration</td>
+                        <td>Container management, auto-scaling, failover</td>
+                        <td>Helm charts, HPA, Istio service mesh</td>
+                    </tr>
+                    <tr style="background: #ede7f6;">
+                        <td>8</td>
+                        <td>Airflow</td>
+                        <td>Job Scheduling</td>
+                        <td>DAG-based scheduling: Spark (2AM), dbt (3AM), checks (4AM)</td>
+                        <td>Cron-based, 3x retries, Slack notifications</td>
+                    </tr>
+                    <tr style="background: #ede7f6;">
+                        <td>8</td>
+                        <td>Terraform</td>
+                        <td>IaC</td>
+                        <td>Infrastructure as Code: Kafka, Snowflake, Redis, K8s</td>
+                        <td>HCL language, S3 remote state, version-controlled</td>
+                    </tr>
+                    <tr style="background: #ede7f6;">
+                        <td>8</td>
+                        <td>Docker</td>
+                        <td>Containerization</td>
+                        <td>Container images: Flink, Spark, APIs, dbt runner</td>
+                        <td>ECR registry, semantic versioning, Python 3.9 base</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- DATA FLOW DIAGRAM -->
+            <h2 style="color: #667eea; font-size: 1.4em; margin: 30px 0 20px 0;">📊 Complete Data Flow</h2>
+
+            <div class="flow-diagram">
+Apps (100K evt/min)
+    ↓
+Kafka (7-day retention, partition by metric_id)
+    ├─→ Schema Registry (validate schema)
+    │
+    └─→ TWO PARALLEL PATHS:
+        │
+        ├─→ [REAL-TIME] Flink (15-30s windows, RocksDB state)
+        │           ↓
+        │       Redis TimeSeries (7d, &lt;5ms)
+        │           ↓
+        │       Memcached (query cache, 5min TTL)
+        │           ↓
+        │       FastAPI (&lt;100ms)
+        │           ↓
+        │       Dashboard (real-time)
+        │
+        └─→ [BATCH] Spark (nightly, exactly-once)
+                    ↓
+                Snowflake (2 years, &lt;500ms)
+                    ├─→ dbt (golden metrics, hourly + daily)
+                    │
+                    ├─→ Parquet + Snappy (S3, Delta Lake)
+                    │
+                    └─→ Glacier (90+ days, archive)
+                        ↓
+                    Query APIs (Analytical &lt;500ms, GraphQL)
+                        ↓
+                    BI Tools (Tableau, Looker)
+
+MONITORING & OPS (across all):
+    ├─→ Prometheus (metrics collection)
+    ├─→ Grafana (system dashboards)
+    ├─→ ELK (log aggregation)
+    ├─→ Great Expectations (data quality)
+    └─→ PagerDuty (alerting)
+
+ORCHESTRATION:
+    ├─→ Kubernetes (pod management, auto-scaling)
+    ├─→ Airflow (DAG scheduling: Spark 2AM, dbt 3AM, checks 4AM)
+    ├─→ Terraform (infrastructure as code)
+    └─→ Docker (containerization)
+            </div>
+
+            <!-- COST SUMMARY -->
+            <h2 style="color: #667eea; font-size: 1.4em; margin: 30px 0 20px 0;">💰 Monthly Cost Breakdown</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Tool</th>
+                        <th>Cost</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background: #e3f2fd;">
+                        <td>Ingestion</td>
+                        <td>Kafka (6 brokers, HA)</td>
+                        <td><strong>$3,000</strong></td>
+                        <td>Self-managed, or $10K if Kinesis</td>
+                    </tr>
+                    <tr style="background: #f3e5f5;">
+                        <td>Real-time Processing</td>
+                        <td>Flink (8-12 task managers)</td>
+                        <td><strong>$8,000</strong></td>
+                        <td>On Kubernetes, auto-scales on lag</td>
+                    </tr>
+                    <tr style="background: #e8f5e9;">
+                        <td>Hot Storage</td>
+                        <td>Redis (350GB cluster)</td>
+                        <td><strong>$5,000</strong></td>
+                        <td>7-day retention, &lt;5ms access</td>
+                    </tr>
+                    <tr style="background: #e8f5e9;">
+                        <td>Cold Storage</td>
+                        <td>Snowflake (2 XL clusters)</td>
+                        <td><strong>$6,000</strong></td>
+                        <td>Auto-suspend off-peak, 2-year retention</td>
+                    </tr>
+                    <tr style="background: #fff3e0;">
+                        <td>Caching</td>
+                        <td>Memcached (small cluster)</td>
+                        <td><strong>Included</strong></td>
+                        <td>Often included in Kubernetes spend</td>
+                    </tr>
+                    <tr style="background: #ffebee;">
+                        <td>Monitoring</td>
+                        <td>Prometheus + Grafana</td>
+                        <td><strong>$500</strong></td>
+                        <td>Open-source, minimal infrastructure</td>
+                    </tr>
+                    <tr style="background: #ffebee;">
+                        <td>Alerting</td>
+                        <td>PagerDuty (5 users)</td>
+                        <td><strong>$500</strong></td>
+                        <td>Incident management</td>
+                    </tr>
+                    <tr style="background: #ede7f6;">
+                        <td>Orchestration</td>
+                        <td>Kubernetes (3 nodes)</td>
+                        <td><strong>~$2,000</strong></td>
+                        <td>AWS EKS or equivalent, node compute</td>
+                    </tr>
+                    <tr style="background: #ede7f6;">
+                        <td>Scheduling</td>
+                        <td>Airflow (managed or self)</td>
+                        <td><strong>Included</strong></td>
+                        <td>Part of K8s cluster</td>
+                    </tr>
+                    <tr style="background: #e8f5e9;">
+                        <td>Archive</td>
+                        <td>S3 + Glacier (tiered)</td>
+                        <td><strong>~$1,000</strong></td>
+                        <td>10:1 compression, $0.01/GB/month Glacier</td>
+                    </tr>
+                    <tr style="background: #666; color: white;">
+                        <td><strong>TOTAL</strong></td>
+                        <td><strong>All above</strong></td>
+                        <td><strong>~$26,000</strong></td>
+                        <td><strong>Per month</strong> (scales linearly to ~$35K at 5K metrics)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- KEY INSIGHTS -->
+            <div class="summary-box" style="margin-top: 30px;">
+                <h3>🎯 Key Insights from Complete Stack</h3>
+                <ul>
+                    <li><strong>Dual Architecture:</strong> Real-time path (Flink → Redis) for dashboards, batch path (Spark → Snowflake) for correctness. Never compromise latency or accuracy.</li>
+                    <li><strong>Parallel Processing:</strong> Flink and Spark run independently on same Kafka source. Flink feeds dashboards in 1-2 min, Spark provides historical record nightly.</li>
+                    <li><strong>Multi-Layer Caching:</strong> Memcached (query results) + Redis (hot data) + dbt (materialized views) = 70% cache hit rate, 10x query speedup for golden metrics.</li>
+                    <li><strong>Separation of Concerns:</strong> Each tool does ONE thing well. Kafka: streaming, Flink: low-latency agg, Spark: batch correctness, Snowflake: analytical queries, Redis: fast reads.</li>
+                    <li><strong>Cost Optimization:</strong> $22K/month for 1000 metrics = $22/metric. At 5000 metrics, unit cost drops to $7/metric (economies of scale).</li>
+                    <li><strong>Operational Excellence:</strong> Prometheus → Grafana → PagerDuty pipeline ensures sub-minute MTTR (Mean Time To Resolution).</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <footer>
+            <p><strong>Metrics Platform Complete Tools Stack | 26 Tools | 8 Stages | Chronological + Parallel</strong></p>
+            <p>Last Updated: June 2026 | For L5 System Design Interviews</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache Spark Complete Setup Guide - Step-by-Step Installation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .section {
+            background-color: #f9f9f9;
+            border-left: 5px solid #1a73e8;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+
+        .section h2 {
+            color: #1a73e8;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .section h3 {
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .step {
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            border-left: 5px solid #1a73e8;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .step-number {
+            display: inline-block;
+            background-color: #1a73e8;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 15px;
+            margin-bottom: 10px;
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: #1a73e8;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .step-content {
+            margin-left: 60px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        code {
+            background-color: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #d73a49;
+        }
+
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 18px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            border-left: 5px solid #4ec9b0;
+        }
+
+        .directory-tree {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.8;
+            overflow-x: auto;
+            border: 2px solid #e0e0e0;
+        }
+
+        .tree-folder {
+            color: #1a73e8;
+            font-weight: 600;
+        }
+
+        .tree-file {
+            color: #333;
+        }
+
+        .tree-indent {
+            margin-left: 20px;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            border-left: 5px solid #ff9800;
+            padding: 18px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .warning-title {
+            font-weight: 700;
+            color: #d32f2f;
+            margin-bottom: 8px;
+        }
+
+        .info-box {
+            background-color: #e3f2fd;
+            border: 2px solid #1a73e8;
+            border-left: 5px solid #1a73e8;
+            padding: 18px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .info-title {
+            font-weight: 700;
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+
+        .success {
+            background-color: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-left: 5px solid #4caf50;
+            padding: 18px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .success-title {
+            font-weight: 700;
+            color: #2e7d32;
+            margin-bottom: 8px;
+        }
+
+        .checklist {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .checklist li:before {
+            content: "☐";
+            position: absolute;
+            left: 0;
+            color: #1a73e8;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+
+        table th {
+            background-color: #1a73e8;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        p {
+            margin: 12px 0;
+            line-height: 1.7;
+        }
+
+        .flow-diagram {
+            background-color: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            line-height: 2.5;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .flow-item {
+            display: inline-block;
+            background-color: #1a73e8;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin: 5px 10px;
+            font-weight: 600;
+        }
+
+        .flow-arrow {
+            color: #1a73e8;
+            font-weight: bold;
+            margin: 0 10px;
+            font-size: 18px;
+        }
+
+        footer {
+            background-color: #f9f9f9;
+            border-top: 2px solid #e0e0e0;
+            padding: 25px;
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            border-radius: 6px;
+        }
+
+        .file-content {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 18px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            border-left: 5px solid #4ec9b0;
+        }
+
+        .file-label {
+            background-color: #f5f5f5;
+            padding: 8px 12px;
+            margin: 15px 0 5px 0;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #1a73e8;
+            font-size: 12px;
+        }
+
+        strong {
+            color: #1a73e8;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚙️ Apache Spark Complete Setup Guide</h1>
+            <p>Step-by-Step Installation & Project Structure for macOS</p>
+        </header>
+
+        <!-- OVERVIEW -->
+        <div class="section">
+            <h2>📋 Installation Overview</h2>
+
+            <p>Here's what you'll install and why:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Version</th>
+                        <th>Size</th>
+                        <th>Purpose</th>
+                        <th>Installation Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Homebrew</strong></td>
+                        <td>Latest</td>
+                        <td>~100MB</td>
+                        <td>Package manager for macOS</td>
+                        <td>2-3 min</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Java JDK 11</strong></td>
+                        <td>11.0+</td>
+                        <td>~300MB</td>
+                        <td>Spark runtime (required)</td>
+                        <td>3-5 min</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Apache Spark</strong></td>
+                        <td>3.5.0+</td>
+                        <td>~180MB</td>
+                        <td>Distributed compute engine</td>
+                        <td>2-3 min</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Python 3</strong></td>
+                        <td>3.9+</td>
+                        <td>~80MB</td>
+                        <td>Python interpreter (PySpark)</td>
+                        <td>Already on Mac</td>
+                    </tr>
+                    <tr>
+                        <td><strong>pip packages</strong></td>
+                        <td>Latest</td>
+                        <td>~500MB</td>
+                        <td>Jupyter, pandas, numpy, etc.</td>
+                        <td>5-10 min</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="flow-diagram">
+                <strong>Total Installation Time: ~15-25 minutes</strong><br>
+                <span class="flow-item">Homebrew</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-item">Java</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-item">Spark</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-item">Python packages</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-item">Project setup</span>
+            </div>
+        </div>
+
+        <!-- STEP 1: HOMEBREW -->
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-title">Install Homebrew (macOS Package Manager)</div>
+            <div class="step-content">
+                <p><strong>What:</strong> Homebrew makes installing programs easy on Mac</p>
+
+                <p><strong>Check if already installed:</strong></p>
+                <div class="code-block">
+brew --version
+<span class="comment"># If installed, you'll see version number</span>
+<span class="comment"># If not, you'll get: command not found</span>
+                </div>
+
+                <p><strong>If NOT installed, run this:</strong></p>
+                <div class="code-block">
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+<span class="comment"># This will:
+# 1. Download Homebrew
+# 2. Install it to /usr/local/opt (on Intel Mac)
+# 3. Setup environment variables
+# Takes 2-3 minutes
+</span>
+                </div>
+
+                <p><strong>Verify installation:</strong></p>
+                <div class="code-block">
+brew --version
+<span class="comment"># Should output: Homebrew 4.x.x</span>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-title">💡 What Homebrew Does</div>
+                    <p>Homebrew = App Store for Mac developers. Instead of downloading installers, you use:</p>
+                    <div class="code-block">
+brew install java          <span class="comment"># Instead of manual download</span>
+brew install apache-spark  <span class="comment"># Simple one-line install</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2: JAVA JDK -->
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-title">Install Java JDK (Spark's Runtime)</div>
+            <div class="step-content">
+                <p><strong>What:</strong> Spark runs on Java Virtual Machine (JVM). Java JDK is required.</p>
+
+                <p><strong>Check if already installed:</strong></p>
+                <div class="code-block">
+java -version
+<span class="comment"># If installed: shows version (e.g., 11.0.20)</span>
+<span class="comment"># If not: command not found</span>
+                </div>
+
+                <p><strong>Install Java JDK 11:</strong></p>
+                <div class="code-block">
+brew install openjdk@11
+<span class="comment"># Downloads and installs Java 11
+# Takes 3-5 minutes
+</span>
+                </div>
+
+                <p><strong>Set JAVA_HOME environment variable:</strong></p>
+                <p>This tells Spark where to find Java. Add to your shell config file:</p>
+
+                <div class="code-block">
+<span class="comment"># Open shell config file (for zsh):</span>
+nano ~/.zprofile
+
+<span class="comment"># Add these lines at the end:</span>
+export JAVA_HOME=$(/usr/libexec/java_home -v 11)
+export PATH=$JAVA_HOME/bin:$PATH
+
+<span class="comment"># Save: Ctrl+O, Enter, Ctrl+X</span>
+                </div>
+
+                <p><strong>Apply changes:</strong></p>
+                <div class="code-block">
+source ~/.zprofile
+                </div>
+
+                <p><strong>Verify Java installation:</strong></p>
+                <div class="code-block">
+java -version
+echo $JAVA_HOME
+<span class="comment"># Should show Java version and /path/to/java</span>
+                </div>
+
+                <div class="warning">
+                    <div class="warning-title">⚠️ Common Issue: "command not found"</div>
+                    <p>If you still can't find Java after installation:</p>
+                    <div class="code-block">
+<span class="comment"># Restart terminal completely (close and reopen)</span>
+<span class="comment"># Then try again</span>
+java -version
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: SPARK -->
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-title">Install Apache Spark</div>
+            <div class="step-content">
+                <p><strong>What:</strong> The actual Spark framework. Will be installed at <code>/usr/local/opt/apache-spark</code></p>
+
+                <p><strong>Install Spark:</strong></p>
+                <div class="code-block">
+brew install apache-spark
+<span class="comment"># Downloads and installs Spark
+# Takes 2-3 minutes
+</span>
+                </div>
+
+                <p><strong>Set SPARK_HOME environment variable:</strong></p>
+                <div class="code-block">
+<span class="comment"># Edit ~/.zprofile again</span>
+nano ~/.zprofile
+
+<span class="comment"># Add these lines:</span>
+export SPARK_HOME=/usr/local/opt/apache-spark/libexec
+export PATH=$SPARK_HOME/bin:$PATH
+
+<span class="comment"># Save: Ctrl+O, Enter, Ctrl+X</span>
+                </div>
+
+                <p><strong>Apply changes:</strong></p>
+                <div class="code-block">
+source ~/.zprofile
+                </div>
+
+                <p><strong>Verify Spark installation:</strong></p>
+                <div class="code-block">
+spark-shell --version
+echo $SPARK_HOME
+<span class="comment"># Should show Spark version and path</span>
+                </div>
+
+                <div class="success">
+                    <div class="success-title">✅ If you see version numbers, Spark is installed!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4: PYTHON PACKAGES -->
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-title">Install Python Packages for Data Science</div>
+            <div class="step-content">
+                <p><strong>What:</strong> Libraries for working with Spark: Jupyter (interactive notebooks), pandas, numpy, etc.</p>
+
+                <p><strong>Check Python version:</strong></p>
+                <div class="code-block">
+python3 --version
+<span class="comment"># Should show 3.9 or higher</span>
+                </div>
+
+                <p><strong>Create requirements file:</strong></p>
+                <div class="code-block">
+cd ~/code/spark
+cat > requirements.txt << 'EOF'
+jupyter==1.0.0
+jupyterlab==4.0.0
+pandas==2.0.3
+numpy==1.24.3
+matplotlib==3.7.1
+scipy==1.11.1
+scikit-learn==1.3.0
+pyspark==3.5.0
+EOF
+                </div>
+
+                <p><strong>Install packages:</strong></p>
+                <div class="code-block">
+pip3 install -r requirements.txt
+<span class="comment"># Takes 5-10 minutes depending on internet speed</span>
+                </div>
+
+                <p><strong>Verify installations:</strong></p>
+                <div class="code-block">
+python3 -c "import pyspark; print(pyspark.__version__)"
+jupyter --version
+<span class="comment"># Both should show version numbers</span>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-title">💡 What Each Package Does</div>
+                    <ul>
+                        <li><strong>jupyter/jupyterlab:</strong> Interactive notebook environment (like Google Colab)</li>
+                        <li><strong>pandas:</strong> Data manipulation library</li>
+                        <li><strong>numpy:</strong> Numerical computing library</li>
+                        <li><strong>matplotlib:</strong> Plotting and visualization</li>
+                        <li><strong>scipy:</strong> Scientific computing</li>
+                        <li><strong>scikit-learn:</strong> Machine learning library</li>
+                        <li><strong>pyspark:</strong> Python API for Spark (already with Spark, but pip version keeps it updated)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 5: PROJECT STRUCTURE -->
+        <div class="step">
+            <div class="step-number">5</div>
+            <div class="step-title">Create Project Directory Structure</div>
+            <div class="step-content">
+                <p><strong>What:</strong> Organize your learning materials in a clean folder structure</p>
+
+                <p><strong>Create directory structure:</strong></p>
+                <div class="code-block">
+mkdir -p ~/code/spark/phase-1-spark-internals/{week-1,week-2,week-3,week-4}
+mkdir -p ~/code/spark/phase-2-streaming/{week-5,week-6,week-7,week-8}
+mkdir -p ~/code/spark/phase-3-system-design/{week-9,week-10,week-11,week-12}
+
+<span class="comment"># Create subdirectories for each week</span>
+for week in ~/code/spark/phase-*/week-*; do
+  mkdir -p "$week/{data,scripts,notebooks,output,config}"
+done
+                </div>
+
+                <p><strong>Your folder structure will look like:</strong></p>
+                <div class="directory-tree">
+<span class="tree-folder">~/code/spark/</span>
+<div class="tree-indent">
+<span class="tree-folder">phase-1-spark-internals/</span>
+<div class="tree-indent">
+<span class="tree-folder">week-1/</span>
+<div class="tree-indent">
+<span class="tree-folder">data/</span> ← Put CSV/JSON files here
+<span class="tree-folder">scripts/</span> ← Python code
+<span class="tree-folder">notebooks/</span> ← Jupyter notebooks
+<span class="tree-folder">output/</span> ← Results/screenshots
+<span class="tree-folder">config/</span> ← Config files
+</div>
+<span class="tree-folder">week-2/</span> (same structure)
+<span class="tree-folder">week-3/</span> (same structure)
+<span class="tree-folder">week-4/</span> (same structure)
+</div>
+
+<span class="tree-folder">phase-2-streaming/</span> (same pattern)
+<span class="tree-folder">phase-3-system-design/</span> (same pattern)
+
+<span class="tree-file">requirements.txt</span> ← Installed earlier
+<span class="tree-file">README.md</span> ← Project overview
+</div>
+
+                <p><strong>Create a README for your project:</strong></p>
+                <div class="code-block">
+cat > ~/code/spark/README.md << 'EOF'
+# Spark Learning Project - 12 Week Intensive
+
+This project contains all materials for the 12-week L5 Data Engineer intensive.
+
+## Project Structure
+- **phase-1-spark-internals/**: Weeks 1-4 (Spark execution, optimization)
+- **phase-2-streaming/**: Weeks 5-8 (Streaming, Kafka, distributed systems)
+- **phase-3-system-design/**: Weeks 9-12 (System design, operations)
+
+## How to Run Code
+```bash
+cd ~/code/spark/phase-1-spark-internals/week-1/scripts
+python3 01_lazy_evaluation.py
+```
+
+## How to Use Jupyter
+```bash
+cd ~/code/spark
+jupyter lab
+# Opens http://localhost:8888 in browser
+```
+
+## Environment Variables
+Java and Spark paths are set in ~/.zprofile
+
+Check with:
+```bash
+echo $JAVA_HOME
+echo $SPARK_HOME
+```
+
+## Quick Links
+- Spark UI: http://localhost:4040 (while Spark job is running)
+- Jupyter: http://localhost:8888 (after `jupyter lab` command)
+EOF
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 6: SAMPLE FILES -->
+        <div class="step">
+            <div class="step-number">6</div>
+            <div class="step-title">Create Sample Data & Config Files</div>
+            <div class="step-content">
+                <p><strong>What:</strong> Sample CSV data and configuration files to get started</p>
+
+                <p><strong>Create sample data:</strong></p>
+                <div class="code-block">
+cat > ~/code/spark/phase-1-spark-internals/week-1/data/sample.csv << 'EOF'
+id,name,age,city,salary
+1,Alice,28,NYC,75000
+2,Bob,34,NYC,85000
+3,Charlie,26,LA,65000
+4,David,29,LA,72000
+5,Eve,31,SF,95000
+6,Frank,25,SF,60000
+7,Grace,32,NYC,88000
+8,Henry,27,LA,68000
+9,Ivy,30,SF,92000
+10,Jack,35,NYC,98000
+EOF
+                </div>
+
+                <p><strong>Create Spark config file:</strong></p>
+                <div class="code-block">
+cat > ~/code/spark/phase-1-spark-internals/week-1/config/log4j.properties << 'EOF'
+log4j.rootCategory=WARN, console
+log4j.appender.console=org.apache.log4j.ConsoleAppender
+log4j.appender.console.target=System.err
+log4j.appender.console.layout=org.apache.log4j.PatternLayout
+log4j.appender.console.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n
+
+# Set specific logger levels for debugging
+log4j.logger.org.apache.spark.sql=INFO
+log4j.logger.org.apache.spark.scheduler=INFO
+EOF
+                </div>
+
+                <p><strong>Create a template Python script:</strong></p>
+                <div class="code-block">
+cat > ~/code/spark/phase-1-spark-internals/week-1/scripts/00_template.py << 'EOF'
+#!/usr/bin/env python3
+"""
+Template Spark Script
+Week 1: Spark Execution Model
+"""
+
+from pyspark.sql import SparkSession
+import sys
+
+def main():
+    # Create Spark Session
+    spark = SparkSession.builder \
+        .appName("WeekX-Topic") \
+        .config("spark.sql.adaptive.enabled", "true") \
+        .getOrCreate()
+
+    print(f"Spark Version: {spark.version}")
+    print(f"Python Version: {sys.version}")
+
+    # Read data
+    df = spark.read.csv(
+        "../data/sample.csv",
+        header=True,
+        inferSchema=True
+    )
+
+    print("Data shape: {} rows".format(df.count()))
+    df.show()
+
+    # Stop Spark
+    spark.stop()
+
+if __name__ == "__main__":
+    main()
+EOF
+
+chmod +x ~/code/spark/phase-1-spark-internals/week-1/scripts/00_template.py
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 7: VERIFY EVERYTHING -->
+        <div class="step">
+            <div class="step-number">7</div>
+            <div class="step-title">Verify Complete Installation</div>
+            <div class="step-content">
+                <p><strong>What:</strong> Test that everything is properly installed and connected</p>
+
+                <p><strong>Run verification script:</strong></p>
+                <div class="code-block">
+cat > ~/verify_spark.sh << 'EOF'
+#!/bin/bash
+echo "═══════════════════════════════════════════"
+echo "  Spark Installation Verification"
+echo "═══════════════════════════════════════════"
+
+echo ""
+echo "1️⃣  Java Status:"
+java -version
+
+echo ""
+echo "2️⃣  JAVA_HOME:"
+echo $JAVA_HOME
+
+echo ""
+echo "3️⃣  Spark Status:"
+spark-shell --version
+
+echo ""
+echo "4️⃣  SPARK_HOME:"
+echo $SPARK_HOME
+
+echo ""
+echo "5️⃣  Python Version:"
+python3 --version
+
+echo ""
+echo "6️⃣  PySpark:"
+python3 -c "import pyspark; print(f'PySpark {pyspark.__version__}')"
+
+echo ""
+echo "7️⃣  Jupyter:"
+jupyter --version
+
+echo ""
+echo "8️⃣  Project Structure:"
+ls -la ~/code/spark/
+
+echo ""
+echo "═══════════════════════════════════════════"
+echo "✅ All checks complete!"
+echo "═══════════════════════════════════════════"
+EOF
+
+chmod +x ~/verify_spark.sh
+~/verify_spark.sh
+                </div>
+
+                <div class="success">
+                    <div class="success-title">✅ Successful Installation Indicators</div>
+                    <ul class="checklist">
+                        <li>All version commands show version numbers (no "command not found")</li>
+                        <li>JAVA_HOME and SPARK_HOME are set correctly</li>
+                        <li>All Python packages installed without errors</li>
+                        <li>Project directory structure created</li>
+                        <li>Sample data and config files present</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 8: RUN FIRST SPARK JOB -->
+        <div class="step">
+            <div class="step-number">8</div>
+            <div class="step-title">Run Your First Spark Job</div>
+            <div class="step-content">
+                <p><strong>What:</strong> Execute a simple Spark program to confirm everything works</p>
+
+                <p><strong>Create first job:</strong></p>
+                <div class="code-block">
+cat > ~/code/spark/phase-1-spark-internals/week-1/scripts/01_first_job.py << 'EOF'
+#!/usr/bin/env python3
+"""
+First Spark Job - Verify installation
+"""
+
+from pyspark.sql import SparkSession
+
+# Create session
+spark = SparkSession.builder \
+    .appName("FirstJob") \
+    .getOrCreate()
+
+print("=" * 50)
+print("✅ Spark Session Created Successfully!")
+print("=" * 50)
+
+# Read CSV
+df = spark.read.csv(
+    "../data/sample.csv",
+    header=True,
+    inferSchema=True
+)
+
+print("\n📊 Data loaded:")
+df.show()
+
+print("\n📈 Statistics:")
+df.select("age", "salary").describe().show()
+
+print("\n🎯 Filtering age > 28:")
+df.filter(df.age > 28).show()
+
+spark.stop()
+print("\n✅ Job completed!")
+EOF
+                </div>
+
+                <p><strong>Run the job:</strong></p>
+                <div class="code-block">
+cd ~/code/spark/phase-1-spark-internals/week-1/scripts
+python3 01_first_job.py
+                </div>
+
+                <p><strong>Expected output:</strong></p>
+                <div class="code-block">
+==================================================
+✅ Spark Session Created Successfully!
+==================================================
+
+📊 Data loaded:
++---+-------+---+----+------+
+| id|   name|age|city|salary|
++---+-------+---+----+------+
+|  1|  Alice| 28| NYC| 75000|
+|  2|    Bob| 34| NYC| 85000|
+...
+
+✅ Job completed!
+                </div>
+
+                <div class="info-box">
+                    <div class="info-title">💡 What Just Happened</div>
+                    <ul>
+                        <li>Your Python script created a Spark Session (driver process)</li>
+                        <li>Spark read the CSV file (RDD created)</li>
+                        <li>Transformations were lazy (just planning)</li>
+                        <li>When you called <code>.show()</code>, execution happened (action)</li>
+                        <li>Results printed to console</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SPARK UI -->
+        <div class="step">
+            <div class="step-number">9</div>
+            <div class="step-title">Access Spark UI Dashboard</div>
+            <div class="step-content">
+                <p><strong>What:</strong> Spark UI shows job execution visualization (critical for learning)</p>
+
+                <p><strong>While your job is running (or just after), open browser:</strong></p>
+                <div class="code-block">
+http://localhost:4040
+                </div>
+
+                <p><strong>You'll see:</strong></p>
+                <ul>
+                    <li><strong>Jobs tab:</strong> List of jobs and their status</li>
+                    <li><strong>DAG Visualization:</strong> Your execution plan visualized</li>
+                    <li><strong>Stages:</strong> Breakdown of stages and tasks</li>
+                    <li><strong>Executors:</strong> How much memory each executor used</li>
+                    <li><strong>Storage:</strong> Cached RDDs in memory</li>
+                </ul>
+
+                <div class="warning">
+                    <div class="warning-title">⚠️ Spark UI Tips</div>
+                    <p>UI is only available while Spark context is alive (job running or just finished). Give yourself 30 seconds to screenshot before it disappears!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- JUPYTER SETUP -->
+        <div class="step">
+            <div class="step-number">10</div>
+            <div class="step-title">Setup & Use Jupyter Notebook</div>
+            <div class="step-content">
+                <p><strong>What:</strong> Interactive notebook environment (optional but useful for exploration)</p>
+
+                <p><strong>Launch Jupyter:</strong></p>
+                <div class="code-block">
+cd ~/code/spark
+jupyter lab
+                </div>
+
+                <p><strong>Expected output:</strong></p>
+                <div class="code-block">
+[I 2026-06-17 10:30:45.123 ServerApp] Jupyter Server 4.0.0 is running at:
+[I 2026-06-17 10:30:45.123 ServerApp]     http://localhost:8888/lab
+[I 2026-06-17 10:30:45.123 ServerApp]     http://127.0.0.1:8888/lab
+                </div>
+
+                <p><strong>Open browser and create new Python notebook:</strong></p>
+                <div class="code-block">
+# In Jupyter cell, run:
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .appName("Jupyter") \
+    .getOrCreate()
+
+df = spark.read.csv("phase-1-spark-internals/week-1/data/sample.csv", header=True)
+df.show()
+                </div>
+
+                <div class="info-box">
+                    <div class="info-title">💡 Jupyter vs Scripts</div>
+                    <ul>
+                        <li><strong>Jupyter:</strong> Good for exploration, visualization, interactive learning</li>
+                        <li><strong>Scripts:</strong> Good for reproducible code, production jobs, version control</li>
+                    </ul>
+                    For this 12-week program, use both!
+                </div>
+            </div>
+        </div>
+
+        <!-- TROUBLESHOOTING -->
+        <div class="section">
+            <h2>🔧 Troubleshooting Common Issues</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Error</th>
+                        <th>Cause</th>
+                        <th>Solution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>command not found: java</code></td>
+                        <td>Java not installed or PATH not set</td>
+                        <td>Run <code>brew install openjdk@11</code> and add JAVA_HOME to ~/.zprofile</td>
+                    </tr>
+                    <tr>
+                        <td><code>command not found: spark-shell</code></td>
+                        <td>Spark not installed or PATH not set</td>
+                        <td>Run <code>brew install apache-spark</code> and add SPARK_HOME to ~/.zprofile</td>
+                    </tr>
+                    <tr>
+                        <td><code>JAVA_HOME is not set</code></td>
+                        <td>Environment variable not configured</td>
+                        <td>Add <code>export JAVA_HOME=$(/usr/libexec/java_home -v 11)</code> to ~/.zprofile</td>
+                    </tr>
+                    <tr>
+                        <td><code>ModuleNotFoundError: pyspark</code></td>
+                        <td>PySpark not installed</td>
+                        <td>Run <code>pip3 install pyspark</code></td>
+                    </tr>
+                    <tr>
+                        <td>Spark UI not showing</td>
+                        <td>Job finished before opening UI</td>
+                        <td>Open http://localhost:4040 while job is running</td>
+                    </tr>
+                    <tr>
+                        <td><code>Address already in use: 4040</code></td>
+                        <td>Another Spark job already running</td>
+                        <td>Close previous Spark job or kill the process</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- FINAL CHECKLIST -->
+        <div class="section">
+            <h2>✅ Final Installation Checklist</h2>
+
+            <ul class="checklist">
+                <li>Homebrew installed and working</li>
+                <li>Java JDK 11 installed and JAVA_HOME set</li>
+                <li>Spark installed and SPARK_HOME set</li>
+                <li>Python 3.9+ available</li>
+                <li>Python packages installed (pyspark, jupyter, pandas, numpy)</li>
+                <li>Project directory structure created</li>
+                <li>Sample data (sample.csv) in place</li>
+                <li>First Spark job ran successfully</li>
+                <li>Spark UI accessible at localhost:4040</li>
+                <li>Jupyter Lab accessible at localhost:8888</li>
+            </ul>
+
+            <div class="success">
+                <div class="success-title">🎉 You're Ready to Start Week 1!</div>
+                <p>All tools are installed and configured. You can now:</p>
+                <ul>
+                    <li>Write Spark scripts and run them: <code>python3 script.py</code></li>
+                    <li>Use Spark Shell interactively: <code>spark-shell</code></li>
+                    <li>Use Jupyter notebooks: <code>jupyter lab</code></li>
+                    <li>Monitor jobs in Spark UI: <code>localhost:4040</code></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- QUICK REFERENCE -->
+        <div class="section">
+            <h2>📖 Quick Reference: Common Commands</h2>
+
+            <div class="info-box">
+                <div class="info-title">Starting Work</div>
+                <div class="code-block">
+<span class="comment"># Navigate to your project</span>
+cd ~/code/spark
+
+<span class="comment"># Run a Python script</span>
+cd phase-1-spark-internals/week-1/scripts
+python3 01_first_job.py
+
+<span class="comment"># Launch Jupyter</span>
+cd ~/code/spark
+jupyter lab
+
+<span class="comment"># Launch Spark Shell (interactive)</span>
+spark-shell
+
+<span class="comment"># View Spark UI (while job running)</span>
+<span class="comment"># Open: http://localhost:4040</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-title">Debugging</div>
+                <div class="code-block">
+<span class="comment"># Check Java</span>
+java -version
+echo $JAVA_HOME
+
+<span class="comment"># Check Spark</span>
+spark-submit --version
+echo $SPARK_HOME
+
+<span class="comment"># Check Python packages</span>
+python3 -c "import pyspark; print(pyspark.__version__)"
+
+<span class="comment"># View environment variables</span>
+cat ~/.zprofile
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>⚙️ Apache Spark Complete Setup Guide | Step-by-Step Installation</p>
+            <p>Total Setup Time: 15-25 minutes | Ready for Week 1 Learning</p>
+        </footer>
+    </div>
+</body>
+</html>

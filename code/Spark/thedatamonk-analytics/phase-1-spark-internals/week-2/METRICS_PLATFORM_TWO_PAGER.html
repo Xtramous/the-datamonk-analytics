@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metrics Platform System Design - Two Pager</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; background: #f5f5f5; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            color: #333;
+        }
+        .page {
+            width: 11in;
+            height: 8.5in;
+            margin: 10px auto;
+            padding: 0.4in;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            page-break-after: always;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            border-radius: 5px;
+            flex-shrink: 0;
+        }
+        header h1 { font-size: 1.4em; margin: 0; }
+        header p { font-size: 0.8em; margin: 3px 0 0 0; opacity: 0.95; }
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            flex: 1;
+            overflow: hidden;
+        }
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+        .column::-webkit-scrollbar { width: 4px; }
+        .column::-webkit-scrollbar-thumb { background: #667eea; border-radius: 2px; }
+        .section {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            flex-shrink: 0;
+        }
+        .section h2 {
+            color: white;
+            background: #667eea;
+            padding: 6px 10px;
+            margin: -10px -10px 8px -10px;
+            font-size: 0.95em;
+            border-radius: 4px 4px 0 0;
+        }
+        .section h3 {
+            color: #764ba2;
+            font-size: 0.9em;
+            margin: 8px 0 4px 0;
+            border-bottom: 2px solid #764ba2;
+            padding-bottom: 3px;
+        }
+        .subsection {
+            margin: 6px 0;
+            padding-left: 6px;
+        }
+        .item {
+            font-size: 0.82em;
+            line-height: 1.45;
+            margin: 4px 0;
+            padding: 5px;
+            background: white;
+            border-left: 3px solid #667eea;
+            border-radius: 2px;
+        }
+        .item strong { color: #667eea; }
+        .item.highlight {
+            background: #e7f3ff;
+            border-left-color: #2196F3;
+        }
+        .item.critical {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+        .item.warning {
+            background: #ffebee;
+            border-left-color: #f44336;
+        }
+        table {
+            width: 100%;
+            font-size: 0.78em;
+            border-collapse: collapse;
+            margin: 5px 0;
+        }
+        thead { background: #667eea; color: white; }
+        th, td { padding: 4px; border: 1px solid #ddd; text-align: left; }
+        td:first-child { font-weight: bold; color: #667eea; background: #f0f4ff; width: 35%; }
+        .flow-diagram {
+            background: #e7f3ff;
+            border: 1px dashed #2196F3;
+            padding: 6px;
+            font-size: 0.8em;
+            margin: 5px 0;
+            border-radius: 3px;
+            font-family: monospace;
+            line-height: 1.4;
+        }
+        .cost-box {
+            background: #e8f5e9;
+            border-left: 3px solid #4caf50;
+            padding: 6px;
+            font-size: 0.8em;
+            margin: 5px 0;
+            border-radius: 3px;
+            line-height: 1.4;
+        }
+        .interview-box {
+            background: #f3e5f5;
+            border-left: 3px solid #9c27b0;
+            padding: 7px;
+            font-size: 0.8em;
+            line-height: 1.45;
+            margin: 5px 0;
+            border-radius: 3px;
+        }
+        .scale-box {
+            background: #e0f2f1;
+            border-left: 3px solid #009688;
+            padding: 6px;
+            font-size: 0.8em;
+            margin: 4px 0;
+            line-height: 1.4;
+        }
+        .tradeoff-box {
+            background: #fce4ec;
+            border-left: 3px solid #e91e63;
+            padding: 6px;
+            font-size: 0.79em;
+            margin: 4px 0;
+            line-height: 1.35;
+        }
+        .key-metric {
+            background: #fff9c4;
+            border-left: 3px solid #ffeb3b;
+            padding: 4px;
+            font-size: 0.8em;
+            margin: 3px 0;
+        }
+        .footer {
+            background: #f5f5f5;
+            border-top: 1px solid #ddd;
+            padding: 6px;
+            font-size: 0.7em;
+            color: #666;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .page2 { margin-top: 20px; }
+        @media print {
+            body { margin: 0; background: white; }
+            .page { box-shadow: none; margin: 0; page-break-after: always; }
+        }
+    </style>
+</head>
+<body>
+    <!-- PAGE 1: ARCHITECTURE & DESIGN -->
+    <div class="page">
+        <header>
+            <h1>📊 Metrics Platform - System Design (Page 1/2)</h1>
+            <p>1000+ metrics, 100 concurrent users, <100ms real-time, <500ms analytical, 2-year retention</p>
+        </header>
+
+        <div class="content">
+            <div class="column">
+                <div class="section">
+                    <h2>🏗️ SYSTEM ARCHITECTURE</h2>
+
+                    <h3>Architecture Flow</h3>
+                    <div class="flow-diagram">
+┌─────────────────────────────────────────────┐
+│  Apps, Web, Mobile                          │
+│  (Generate 100K events/min)                 │
+└────────────────────┬────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────┐
+│  🚀 INGESTION: Kafka Cluster                │
+│  • Partition by metric_id (hot/cold)        │
+│  • Schema Registry (versioning)             │
+│  • 7-day retention (replay capability)      │
+└────────────────────┬────────────────────────┘
+                     │
+        ┌────────────┴────────────┐
+        ▼                         ▼
+    REAL-TIME              BATCH (Nightly)
+    Flink Streams          Spark Aggregation
+    (15-30s windows)       (Full day events)
+    RocksDB state          Exactly-once
+    │                      │
+    ▼                      ▼
+ Redis TS             Snowflake
+ (1min flush)         (Fact tables)
+    │                      │
+    └────────────┬─────────┘
+                 ▼
+    3 QUERY APIs (Fast/Analytical/GraphQL)
+                 │
+         ┌───────┼───────┐
+         ▼       ▼       ▼
+       Fast  Analytical GraphQL
+      &lt;100ms &lt;500ms   (Batched)
+                    </div>
+
+                    <h3>1. INGESTION LAYER (Kafka)</h3>
+                    <div class="item highlight">
+                        <strong>Throughput:</strong> 100K events/minute = 1,667 events/second
+                    </div>
+                    <div class="item">
+                        <strong>Partitioning:</strong> metric_id (isolates hot metrics from cold, e.g., "revenue" vs "page_views_on_mobile_in_japan")
+                    </div>
+                    <div class="item">
+                        <strong>Schema Registry:</strong> Enforces compatibility between producers/consumers. Prevents parsing failures when metric schema evolves (critical at 1000+ metrics)
+                    </div>
+                    <div class="item">
+                        <strong>Retention:</strong> 7 days enables replay if Flink/Spark job fails
+                    </div>
+                    <div class="item critical">
+                        <strong>Cost Decision:</strong> Kafka ($3K/mo, 6 brokers) vs Kinesis ($10K/mo). Tradeoff: ops overhead vs $7K/month savings
+                    </div>
+
+                    <h3>2. COMPUTE LAYER (Dual Engines)</h3>
+                    <div class="subsection">
+                        <strong>Real-time Path: Apache Flink</strong>
+                        <div class="item">
+                            <strong>Windows:</strong> 15-30 second sliding windows (granular aggregation)
+                        </div>
+                        <div class="item">
+                            <strong>State Backend:</strong> RocksDB (embedded KV store, fault-tolerant)
+                        </div>
+                        <div class="item">
+                            <strong>Aggregations:</strong> SUM, COUNT, PERCENTILES(p50, p95, p99)
+                        </div>
+                        <div class="item">
+                            <strong>Output:</strong> Flushed to Redis every 1 minute (batched writes for efficiency)
+                        </div>
+                        <div class="item">
+                            <strong>Latency:</strong> Event arrival → Flink aggregation → Redis ≈ 1-2 minutes to dashboard
+                        </div>
+                    </div>
+
+                    <div class="subsection">
+                        <strong>Batch Path: Apache Spark</strong>
+                        <div class="item">
+                            <strong>Schedule:</strong> Nightly (e.g., 2 AM UTC) processes full day's Kafka events
+                        </div>
+                        <div class="item">
+                            <strong>Late Arrivals:</strong> 24-hour deduplication window (catches events arriving >1hr late)
+                        </div>
+                        <div class="item">
+                            <strong>Exactly-Once:</strong> Idempotent writes (SUM, COUNT use database UPSERT) prevent double-counting
+                        </div>
+                        <div class="item">
+                            <strong>Output:</strong> Writes to Snowflake fact tables (immutable, append-optimized)
+                        </div>
+                    </div>
+
+                    <div class="item critical">
+                        <strong>Why Dual?</strong> Flink optimized for low-latency (streams), Spark optimized for batch correctness. Single engine can't excel at both.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>3. STORAGE LAYER (Tiered)</h2>
+
+                    <h3>HOT PATH (0-7 days)</h3>
+                    <div class="item highlight">
+                        <strong>Technology:</strong> Redis TimeSeries Cluster (RTS module)
+                    </div>
+                    <div class="item">
+                        <strong>Capacity:</strong> 350-500GB on-disk (7 days × 1000 metrics × 100 dimensions × ~3KB per series)
+                    </div>
+                    <div class="item">
+                        <strong>Latency:</strong> &lt;5ms reads (pure RAM with RDB persistence)
+                    </div>
+                    <div class="item">
+                        <strong>Key Structure:</strong> <br/>
+                        metric:{metric_id}:{dim1=val1}:{dim2=val2}:{timestamp} <br/>
+                        Example: metric:revenue:region=US:product=pro:1718821200
+                    </div>
+                    <div class="item">
+                        <strong>TTL:</strong> Automatic expiration after 7 days (Redis EXPIRE)
+                    </div>
+                    <div class="item">
+                        <strong>Query:</strong> O(1) time-range + dimension filters via ZRANGE with predicates
+                    </div>
+
+                    <h3>COLD PATH (7 days - 2 years)</h3>
+                    <div class="item highlight">
+                        <strong>Technology:</strong> Snowflake + Delta Lake (S3 Parquet)
+                    </div>
+                    <div class="item">
+                        <strong>Schema:</strong> Star schema<br/>
+                        • Fact: metrics_fact (metric_id, timestamp, dim1_id, dim2_id, value)<br/>
+                        • Dimensions: dim_date, dim_product, dim_geography, etc.
+                    </div>
+                    <div class="item">
+                        <strong>Partitioning:</strong> By date (2024-06-19, 2024-06-20, ...), nested by metric_id
+                    </div>
+                    <div class="item">
+                        <strong>Compression:</strong> Parquet + Snappy = 10:1 ratio (100GB raw → 10GB compressed)
+                    </div>
+                    <div class="item">
+                        <strong>Latency:</strong> &lt;500ms (vectorized query execution, columnar scan efficiency)
+                    </div>
+                    <div class="item">
+                        <strong>Retention:</strong> Full 2 years; move to Glacier after 90 days (cheaper storage, slower access OK for archive)
+                    </div>
+
+                    <h3>MATERIALIZED VIEWS (dbt)</h3>
+                    <div class="item highlight">
+                        <strong>Golden Metrics (Top 50):</strong> revenue, orders, margin, CSAT, attribution, churn, etc.
+                    </div>
+                    <div class="item">
+                        <strong>Refresh:</strong> Nightly (after Spark batch completes)
+                    </div>
+                    <div class="item">
+                        <strong>Granularity:</strong> Pre-aggregated at 1-hour and daily level (faster than raw facts)
+                    </div>
+                    <div class="item">
+                        <strong>Storage:</strong> Snowflake native + hot subset synced to Redis
+                    </div>
+                    <div class="item critical">
+                        <strong>Impact:</strong> 99% of queries hit pre-agg data: 500ms query → &lt;50ms
+                    </div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="section">
+                    <h2>4. QUERY LAYER (3 APIs)</h2>
+
+                    <h3>Fast Query API (&lt;100ms SLA)</h3>
+                    <div class="item highlight">
+                        <strong>Use Case:</strong> Real-time dashboards (sales dashboard, ops monitoring)
+                    </div>
+                    <div class="item">
+                        <strong>Endpoint:</strong> GET /metrics/{metric_id}?dimensions=geography,product&time_range=7d
+                    </div>
+                    <div class="item">
+                        <strong>Storage:</strong> Redis TimeSeries (direct hit on hot cache)
+                    </div>
+                    <div class="item">
+                        <strong>Query Logic:</strong> Time-range + dimension filter in O(1) with Redis ZRANGE + predicates
+                    </div>
+                    <div class="item">
+                        <strong>Example Response:</strong><br/>
+                        {<br/>
+&nbsp;&nbsp;"metric": "revenue",<br/>
+&nbsp;&nbsp;"dimensions": {"region": "US", "product": "Pro"},<br/>
+&nbsp;&nbsp;"data": [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{"timestamp": 1718821200, "value": 50000},<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{"timestamp": 1718821260, "value": 51200}<br/>
+&nbsp;&nbsp;]<br/>
+                        }
+                    </div>
+                    <div class="item">
+                        <strong>Response Caching:</strong> Result cached 5min in Memcached. Invalidated on new Flink flush.
+                    </div>
+
+                    <h3>Analytical Query API (&lt;500ms SLA)</h3>
+                    <div class="item highlight">
+                        <strong>Use Case:</strong> Data explorers, BI tools, ad-hoc analysis
+                    </div>
+                    <div class="item">
+                        <strong>Request Example:</strong><br/>
+POST /query<br/>
+{<br/>
+&nbsp;&nbsp;"metrics": ["revenue", "orders", "margin"],<br/>
+&nbsp;&nbsp;"dimensions": ["date", "geography", "channel"],<br/>
+&nbsp;&nbsp;"filters": {"geography": ["US", "EU"], "channel": "direct_mail"},<br/>
+&nbsp;&nbsp;"granularity": "daily",<br/>
+&nbsp;&nbsp;"time_range": "90d"<br/>
+}
+                    </div>
+                    <div class="item">
+                        <strong>Query Optimizer:</strong> Detects filter selectivity. If filtering results in &lt;1M rows, runs on hot storage (Redis). Else, routes to Snowflake cold path.
+                    </div>
+                    <div class="item">
+                        <strong>Result Caching:</strong> Large result sets (100M rows → 10MB compressed) cached in Memcached, 5min TTL
+                    </div>
+
+                    <h3>GraphQL Layer (BI Integrations)</h3>
+                    <div class="item highlight">
+                        <strong>Use Case:</strong> Tableau, Looker, Power BI integrations
+                    </div>
+                    <div class="item">
+                        <strong>Batching:</strong> Combines N independent metric requests into 1 Snowflake query (N calls → 1 query)
+                    </div>
+                    <div class="item">
+                        <strong>Field Resolution:</strong> Handles aliases (revenue_usd → gross_revenue - taxes - refunds)
+                    </div>
+                    <div class="item">
+                        <strong>Benefit:</strong> Reduces round-trip latency significantly for dashboard fetches
+                    </div>
+
+                    <div class="item critical">
+                        <strong>Why 3 APIs?</strong> Different tools, different needs. Dashboards tolerate <100ms. BI tools pre-fetch reports, can wait 500ms. GraphQL for integrations needing efficient batching.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>5. CACHING LAYER</h2>
+
+                    <h3>Multi-Layer Cache Architecture</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Layer</th><th>Technology</th><th>TTL</th><th>Hit Rate</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>L1: Query Results</td>
+                                <td>Memcached</td>
+                                <td>5 min</td>
+                                <td>70%</td>
+                            </tr>
+                            <tr>
+                                <td>L2: Hot Data</td>
+                                <td>Redis TimeSeries</td>
+                                <td>7d (TTL)</td>
+                                <td>100%</td>
+                            </tr>
+                            <tr>
+                                <td>L3: Cold Data</td>
+                                <td>Snowflake Cache</td>
+                                <td>1d</td>
+                                <td>40%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Cache Invalidation Strategy</h3>
+                    <div class="item">
+                        <strong>Event-Driven:</strong> When Flink outputs new data (1min), publishes cache invalidation event
+                    </div>
+                    <div class="item">
+                        <strong>Invalidation Event Format:</strong> {metric_id, timestamp, affected_dimensions}
+                    </div>
+                    <div class="item">
+                        <strong>Query API Logic:</strong> Checks invalidation log before serving from Memcached. If hit invalidation timestamp after cache write, miss and recompute.
+                    </div>
+                    <div class="item">
+                        <strong>No Thundering Herd:</strong> Stagger cache refresh across 50 replicas (each replica refreshes different key range)
+                    </div>
+                    <div class="item critical">
+                        <strong>Tradeoff:</strong> Cache coherence is hard. Alternative: no explicit invalidation, just TTL expiry (simpler but 5min stale reads). For revenue metrics, explicit invalidation is necessary.
+                    </div>
+
+                    <h3>Cache Efficiency Metrics</h3>
+                    <div class="key-metric">
+                        <strong>70% hit rate:</strong> Users ask same questions repeatedly (revenue by region, top products, etc.). Pre-agg golden metrics amplify hits.
+                    </div>
+                    <div class="key-metric">
+                        <strong>70% cache hit = 3x effective throughput</strong> (cache serves instantly, DB saves compute)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Page 1 of 2 | Architecture & Components | Continue to Page 2 for Tradeoffs, Reliability, Scaling, Costs, and Interview Prep
+        </div>
+    </div>
+
+    <!-- PAGE 2: TRADEOFFS, RELIABILITY, SCALING, COSTS, INTERVIEW -->
+    <div class="page page2">
+        <header>
+            <h1>📊 Metrics Platform - System Design (Page 2/2)</h1>
+            <p>Tradeoffs, Reliability, Scaling, Costs, and Interview Narrative</p>
+        </header>
+
+        <div class="content">
+            <div class="column">
+                <div class="section">
+                    <h2>⚖️ KEY TRADEOFFS</h2>
+
+                    <div class="tradeoff-box">
+                        <strong>1. DUAL STORAGE (Hot + Cold)</strong><br/>
+                        ✓ Achieve &lt;100ms latency (Redis) + 2-year retention (Snowflake)<br/>
+                        ✗ Operational complexity (manage 2 systems), data sync overhead (eventual consistency)<br/>
+                        💡 <strong>Why:</strong> Impossible to achieve both with single system. Snowflake alone can't do &lt;100ms. Redis can't store 2yr cheaply.
+                    </div>
+
+                    <div class="tradeoff-box">
+                        <strong>2. KAFKA vs KINESIS</strong><br/>
+                        ✓ Kafka: $3K/mo, portable (multi-cloud), self-managed<br/>
+                        ✗ Operational overhead (6-9 node HA cluster, monitoring)<br/>
+                        ✓ Kinesis: Fully managed (AWS)<br/>
+                        ✗ $10K/mo, vendor lock-in<br/>
+                        💡 <strong>Why:</strong> At 100K events/min, $7K/month savings justify ops overhead. K8s automation makes Kafka manageable.
+                    </div>
+
+                    <div class="tradeoff-box">
+                        <strong>3. FLINK + SPARK (Dual Compute)</strong><br/>
+                        ✓ Flink for low-latency streams (15-30s windows), Spark for batch correctness<br/>
+                        ✗ Dual codebases, more infrastructure to manage, learning curve<br/>
+                        ✓ Single Spark: simpler, one codebase<br/>
+                        ✗ Micro-batches → higher latency (&gt;1min), not suitable for dashboards<br/>
+                        💡 <strong>Why:</strong> Can't sacrifice latency. Separate engines optimize for their strengths.
+                    </div>
+
+                    <div class="tradeoff-box">
+                        <strong>4. EVENTUAL CONSISTENCY (5min lag)</strong><br/>
+                        ✓ Accept 5-min lag between Redis and Snowflake (no sync complexity)<br/>
+                        ✗ Temporary data divergence (revenue in Redis may differ from Snowflake)<br/>
+                        ✓ Alternative: synchronous writes (strong consistency)<br/>
+                        ✗ Distributed transaction complexity, latency adds up<br/>
+                        💡 <strong>Why:</strong> For most metrics (pageviews, clicks), 5min lag acceptable. For revenue: nightly reconciliation flags &gt;1% discrepancies + alerts.
+                    </div>
+
+                    <div class="tradeoff-box">
+                        <strong>5. MATERIALIZED VIEWS (Pre-aggregation)</strong><br/>
+                        ✓ Pre-compute 50 golden metrics (revenue, orders, CSAT, attribution) → 10x query speedup<br/>
+                        ✗ Requires forecasting which metrics matter (non-obvious with 1000+ metrics)<br/>
+                        ✗ Maintenance burden (dbt jobs, schema evolution)<br/>
+                        💡 <strong>Why:</strong> 70% of queries hit 50 metrics. Pre-agg reduces 500ms → &lt;50ms for those. Covers 80/20 rule.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>🔒 RELIABILITY</h2>
+
+                    <h3>Exactly-Once Semantics (Revenue Metrics)</h3>
+                    <div class="item highlight">
+                        <strong>Critical:</strong> Revenue, ad spend, refunds must never be double-counted
+                    </div>
+                    <div class="item">
+                        <strong>Spark Path:</strong> Idempotent aggregations. SUM/COUNT use database UPSERT (overwrite, not append). 24-hour deduplication window catches late arrivals.
+                    </div>
+                    <div class="item">
+                        <strong>Flink Path:</strong> Kafka offset checkpointing (stores processed offset to RocksDB). If Flink restarts, resumes from saved offset, skips already-processed events.
+                    </div>
+
+                    <h3>Backfilling & Replay</h3>
+                    <div class="item">
+                        <strong>Schema Changes:</strong> Schema Registry versions captured. If event schema evolves (e.g., added new dimension), Flink/Spark can handle multiple versions simultaneously.
+                    </div>
+                    <div class="item">
+                        <strong>Job Failure:</strong> Kafka 7-day retention enables re-processing. Spark replay: <code>spark-submit ... --date-range 2024-06-18 2024-06-19</code>
+                    </div>
+                    <div class="item">
+                        <strong>Logic Bug:</strong> If aggregation logic bug discovered, replay Spark job with corrected logic. Redis data already expired (7d TTL), so stale data doesn't linger.
+                    </div>
+
+                    <h3>Data Quality</h3>
+                    <div class="item">
+                        <strong>Flink Validation:</strong> Real-time checks (metric_value &gt; 0? revenue &gt; 0?). Bad events dropped + alert to ops.
+                    </div>
+                    <div class="item">
+                        <strong>Snowflake Tests (dbt):</strong> Null counts, freshness (latest record within 1hr?), referential integrity (dim_id exists in dimension table?).
+                    </div>
+                    <div class="item">
+                        <strong>Alerting:</strong> Prometheus metrics on late-arriving data (&gt;1hr lag → PagerDuty). Reconciliation job flags &gt;1% Redis/Snowflake discrepancy.
+                    </div>
+
+                    <h3>Disaster Recovery</h3>
+                    <div class="item">
+                        <strong>Kafka Down (&lt;10min expected):</strong> Apps buffer events locally for 1 hour. Dashboards show 7-day cached data (stale but available). Resume normal flow on recovery.
+                    </div>
+                    <div class="item">
+                        <strong>Redis Failure:</strong> Flink can re-flush last 1 minute of data. Alerts notify team. Cold path (Snowflake) always available.
+                    </div>
+                    <div class="item">
+                        <strong>Snowflake Failure:</strong> Rare (SLA 99.9%). Cold path unavailable, but hot path (7d Redis) continues. Historical queries degrade to Redis-only for those 7 days.
+                    </div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="section">
+                    <h2>📈 SCALING PLAN</h2>
+
+                    <h3>Current State (1000 metrics)</h3>
+                    <div class="key-metric">
+                        <strong>Redis Memory:</strong> ~350GB (comfortable, room to grow)
+                    </div>
+                    <div class="key-metric">
+                        <strong>Flink Tasks:</strong> 8-12 task managers (auto-scale on kafka_consumer_lag)
+                    </div>
+                    <div class="key-metric">
+                        <strong>Snowflake Compute:</strong> 2 XL clusters (auto-suspend during off-peak)
+                    </div>
+                    <div class="key-metric">
+                        <strong>Throughput:</strong> 100K events/min easily handled
+                    </div>
+
+                    <h3>At 5000 Metrics (12 months)</h3>
+                    <div class="scale-box">
+                        <strong>Redis:</strong> Shift 80% of hot data → Snowflake hot cluster (faster), keep only top 200 golden metrics in Redis<br/>
+                        <strong>Reasoning:</strong> 4000 metrics don't need &lt;5ms access. 1hour Snowflake cluster sufficient. 30% cost savings.
+                    </div>
+                    <div class="scale-box">
+                        <strong>Flink:</strong> 20-30 task managers. Partition rebalancing handled automatically by Kafka consumer groups.
+                    </div>
+                    <div class="scale-box">
+                        <strong>Spark:</strong> Add intermediate hourly aggregation layer (pre-agg top 500 metrics hourly → Kafka → Flink final window). Reduces Flink state size.
+                    </div>
+                    <div class="scale-box">
+                        <strong>Cost:</strong> ~$35K/mo (linear growth from $22K)
+                    </div>
+
+                    <h3>At 10000 Metrics (24 months)</h3>
+                    <div class="scale-box">
+                        <strong>Real-time Sunset:</strong> Disable real-time path for non-critical metrics (e.g., internal diagnostics). Batch-only pipeline saves 40% Flink compute.
+                    </div>
+                    <div class="scale-box">
+                        <strong>Federated Query:</strong> Multiple Snowflake clusters by region (US-east, EU, APAC). Reduces latency for regional queries.
+                    </div>
+                    <div class="scale-box">
+                        <strong>Tiering:</strong> S3 → Glacier after 90 days (cold archive, rarely queried)
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>💰 COST BREAKDOWN</h2>
+
+                    <h3>Current (1000 metrics, 100 users)</h3>
+                    <div class="cost-box">
+                        <strong>Total: ~$22K/month</strong><br/>
+                        • Kafka: $3K (6 brokers, HA)<br/>
+                        • Flink: $8K (8-12 task mgrs)<br/>
+                        • Redis: $5K (350GB cluster)<br/>
+                        • Snowflake: $6K (2 XL, auto-suspend off-peak)<br/>
+                    </div>
+
+                    <h3>Cost Optimization Techniques</h3>
+                    <div class="item">
+                        <strong>Tiered Storage:</strong> 7d Redis (hot, expensive), 30d Snowflake warm cluster, 2yr S3 + Glacier (cheap archive)
+                    </div>
+                    <div class="item">
+                        <strong>Compression:</strong> Parquet + Snappy = 10:1 ratio (100GB → 10GB stored)
+                    </div>
+                    <div class="item">
+                        <strong>Auto-Scaling:</strong> Flink scales on kafka_consumer_lag. Snowflake compute suspends off-peak (7 PM - 8 AM).
+                    </div>
+                    <div class="item">
+                        <strong>Pre-Aggregation:</strong> Materialized views reduce per-query compute 10x for golden metrics (indirect cost savings).
+                    </div>
+
+                    <h3>Cost Per Metric Per Month</h3>
+                    <div class="key-metric">
+                        <strong>$22K ÷ 1000 metrics = $22/metric/month</strong><br/>
+                        (At 5000 metrics: $35K ÷ 5000 = $7/metric/month. Scale improves unit economics!)
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>🎤 INTERVIEW NARRATIVE</h2>
+
+                    <div class="interview-box">
+                        <strong>"The core challenge here is that real-time and historical have fundamentally conflicting requirements.</strong><br/><br/>
+
+                        <strong>Real-time needs &lt;100ms latency—impossible with Snowflake alone.</strong> A query that scans 2 years of data (Snowflake's table) takes &gt;500ms at best, even with vectorized execution. <strong>Historical needs 2+ years retention and analytical flexibility—Redis can't store that cheaply.</strong> Storing 2 years in RAM costs $200K+ annually.<br/><br/>
+
+                        <strong>So I use a dual storage approach:</strong> Redis for 7-day hot data with &lt;5ms reads, Snowflake for cold data with &lt;500ms queries. Materialized views pre-compute 50 golden metrics (revenue, orders, CSAT, etc.) at hourly and daily granularity, so 99% of queries hit pre-agg data and respond in &lt;50ms.<br/><br/>
+
+                        <strong>For ingestion, I use Kafka with Schema Registry.</strong> Kafka gives replay capability (7-day retention) so if a stream job fails, I can re-process without re-running all aggregations. Schema Registry enforces producer-consumer contracts—prevents parsing failures when a metric's schema evolves (critical at 1000+ metrics).<br/><br/>
+
+                        <strong>For compute, I run two engines:</strong> Flink handles real-time streams with 15-30 second windows, flushed to Redis every minute (feeds dashboards instantly). Spark runs nightly batch jobs to re-aggregate the full day's events, catches late arrivals, and enforces exactly-once semantics for revenue metrics where accuracy is non-negotiable. Flink excels at latency, Spark excels at batch correctness. I don't force one to do both.<br/><br/>
+
+                        <strong>On the query side, I expose three APIs.</strong> Fast API hits Redis directly for real-time questions (&lt;100ms). Analytical API hits Snowflake for complex joins (&lt;500ms). GraphQL layer batches N independent requests into a single Snowflake query, reducing round-trips from N to 1.<br/><br/>
+
+                        <strong>The biggest trade-off is consistency.</strong> Because Redis and Snowflake are asynchronous, there's a ~5-minute lag where they diverge. For most metrics (pageviews, clicks), that's fine. For revenue, I run a nightly reconciliation that flags discrepancies &gt;1% and alerts ops. It's a deliberate choice: buy latency by accepting eventual consistency rather than synchronous writes across both paths (which would add distributed transaction complexity).<br/><br/>
+
+                        <strong>At 100 concurrent users with 1000 metrics, this architecture costs ~$22K/month.</strong> If we grow to 5000 metrics, I'd shift 80% of hot data to Snowflake's hot cluster and keep only the top 200 metrics in Redis—trading some latency for linear cost growth to ~$35K/month."
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>❓ FOLLOW-UP QUESTIONS</h2>
+
+                    <div class="item critical">
+                        <strong>Q: Why not just BigQuery/Redshift?</strong><br/>
+                        A: Can't achieve &lt;100ms with cold storage alone. Columnar engines (BigQuery, Redshift) excel at full-table scans but struggle with sub-second latency. Tiered approach (hot + cold) is necessary.
+                    </div>
+
+                    <div class="item critical">
+                        <strong>Q: How do you handle schema evolution?</strong><br/>
+                        A: Schema Registry versions captured. Flink uses schema-on-read (ignores new fields, reads old ones). Spark handles multiple versions during backfill by selecting union of all schemas.
+                    </div>
+
+                    <div class="item critical">
+                        <strong>Q: What if Kafka goes down?</strong><br/>
+                        A: Apps buffer events locally for 1 hour. Kafka recovery takes &lt;10min with proper replication (3x). Dashboards fall back to 7-day Redis cache (stale but available). Resume normal flow on recovery.
+                    </div>
+
+                    <div class="item critical">
+                        <strong>Q: How do you test dual-path consistency?</strong><br/>
+                        A: dbt tests on Snowflake (row counts, null checks), Flink unit tests, integration tests that write to both paths and compare tail records (last 100 rows must match).
+                    </div>
+
+                    <div class="item critical">
+                        <strong>Q: How do you handle hot metric skew?</strong><br/>
+                        A: Kafka partitioning by metric_id isolates hot metrics (revenue) from cold ones. "Revenue" partition stays on fast broker, doesn't block "page_views_on_mobile_in_japan" partition.
+                    </div>
+
+                    <div class="item critical">
+                        <strong>Q: Would you use Kinesis/BigQuery?</strong><br/>
+                        A: Kinesis ($10K/mo) costs 3x Kafka. BigQuery + Cloud Spanner have vendor lock-in. Kafka + Snowflake stack is open, cheaper, flexible for multi-cloud future.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Page 2 of 2 | Tradeoffs, Reliability, Scaling, Costs, and Interview Prep | Print both pages for complete reference
+        </div>
+    </div>
+</body>
+</html>

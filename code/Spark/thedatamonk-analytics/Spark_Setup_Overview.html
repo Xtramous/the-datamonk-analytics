@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache Spark Setup - Complete Overview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .section {
+            background-color: #f9f9f9;
+            border-left: 5px solid #1a73e8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .section h2 {
+            color: #1a73e8;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .subsection {
+            margin: 20px 0;
+        }
+
+        .subsection h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border-bottom: 2px solid #1a73e8;
+            padding-bottom: 8px;
+        }
+
+        .concept-box {
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            border-left: 5px solid #1a73e8;
+        }
+
+        .concept-title {
+            font-weight: 600;
+            color: #1a73e8;
+            margin-bottom: 8px;
+        }
+
+        .concept-text {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        code {
+            background-color: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .code-block .comment {
+            color: #6a9955;
+        }
+
+        .code-block .keyword {
+            color: #569cd6;
+        }
+
+        .code-block .string {
+            color: #ce9178;
+        }
+
+        .directory-tree {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .tree-item {
+            margin-left: 20px;
+        }
+
+        .tree-folder {
+            color: #1a73e8;
+            font-weight: 600;
+        }
+
+        .tree-file {
+            color: #333;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            border-left: 5px solid #ff9800;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .warning-title {
+            font-weight: 600;
+            color: #d32f2f;
+            margin-bottom: 8px;
+        }
+
+        .info {
+            background-color: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-left: 5px solid #1a73e8;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .info-title {
+            font-weight: 600;
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+
+        .success {
+            background-color: #e8f5e9;
+            border: 1px solid #4caf50;
+            border-left: 5px solid #388e3c;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .success-title {
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+
+        table th {
+            background-color: #1a73e8;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .flow-diagram {
+            background-color: #f5f5f5;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 12px;
+            line-height: 2;
+            text-align: center;
+        }
+
+        .arrow {
+            color: #1a73e8;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        .checklist {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .checklist li:before {
+            content: "☑";
+            position: absolute;
+            left: 0;
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        footer {
+            background-color: #f9f9f9;
+            border-top: 1px solid #e0e0e0;
+            padding: 20px;
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .highlight {
+            background-color: #fff59d;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+
+        .step-number {
+            display: inline-block;
+            background-color: #1a73e8;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .step {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #1a73e8;
+            border-radius: 2px;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        strong {
+            color: #1a73e8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Apache Spark Setup - Complete Overview</h1>
+            <p>Understanding what "Spark Setup" means, what gets installed, and how it all works together</p>
+        </header>
+
+        <!-- WHAT IS SPARK SETUP -->
+        <div class="section">
+            <h2>1️⃣ What Does "Setting Up Spark" Mean?</h2>
+
+            <div class="concept-box">
+                <div class="concept-title">Simple Definition:</div>
+                <div class="concept-text">
+                    <strong>Spark Setup</strong> = Installing and configuring Apache Spark + its dependencies so you can write and run distributed data processing jobs on your local machine or cluster.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Setup Involves Three Layers:</h3>
+
+                <div style="margin: 15px 0;">
+                    <p><span class="step-number">1</span><strong>Prerequisites (Foundation)</strong></p>
+                    <ul>
+                        <li><code>Java JDK</code> - Spark runs on Java Virtual Machine (JVM)</li>
+                        <li><code>Environment Variables</code> - Tell OS where to find Java and Spark</li>
+                        <li><code>Package Manager</code> - Homebrew (macOS) to install everything</li>
+                    </ul>
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <p><span class="step-number">2</span><strong>Spark Installation</strong></p>
+                    <ul>
+                        <li><code>Spark Binary</code> - Download and extract Spark files</li>
+                        <li><code>Configuration Files</code> - Setup logging, memory, executor settings</li>
+                        <li><code>PySpark (Optional)</code> - Python API for Spark; requires Python 3</li>
+                    </ul>
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <p><span class="step-number">3</span><strong>Development Environment</strong></p>
+                    <ul>
+                        <li><code>Project Directory Structure</code> - Where your code, data, and config live</li>
+                        <li><code>IDE/Editor</code> - VS Code or PyCharm for writing code</li>
+                        <li><code>Testing & Debugging Tools</code> - Spark Shell, Jupyter, logging</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info">
+                <div class="info-title">💡 Key Concept: Local vs Cluster Mode</div>
+                <div class="concept-text">
+                    When you "setup Spark locally," you're installing Spark to run in <strong>Local Mode</strong> = Spark runs on your single machine using multiple threads (not actual distributed). This simulates how Spark would work on a real cluster, but everything stays on your laptop.
+                </div>
+            </div>
+        </div>
+
+        <!-- WHAT GETS INSTALLED FIRST -->
+        <div class="section">
+            <h2>2️⃣ Installation Order (What Gets Installed First?)</h2>
+
+            <div class="flow-diagram">
+                Java JDK
+                <span class="arrow">→</span>
+                Environment Variables
+                <span class="arrow">→</span>
+                Spark Binary
+                <span class="arrow">→</span>
+                Python & PySpark
+                <span class="arrow">→</span>
+                Project Setup
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Component</th>
+                        <th>Purpose</th>
+                        <th>Size</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1️⃣ First</strong></td>
+                        <td><code>Java JDK 8 or 11</code></td>
+                        <td>Spark's runtime environment. Spark code compiles to Java bytecode</td>
+                        <td>~300MB</td>
+                        <td>2-3 min</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2️⃣ Second</strong></td>
+                        <td><code>Environment Variables</code></td>
+                        <td>Tell OS where Java & Spark are installed. Added to <code>~/.zprofile</code></td>
+                        <td>N/A</td>
+                        <td>1 min</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3️⃣ Third</strong></td>
+                        <td><code>Spark Binary</code></td>
+                        <td>The actual Spark framework (~400MB when extracted)</td>
+                        <td>~180MB</td>
+                        <td>2-3 min</td>
+                    </tr>
+                    <tr>
+                        <td><strong>4️⃣ Fourth</strong></td>
+                        <td><code>Python 3 + Jupyter</code></td>
+                        <td>For writing PySpark code instead of Scala. Development experience</td>
+                        <td>~500MB</td>
+                        <td>5 min</td>
+                    </tr>
+                    <tr>
+                        <td><strong>5️⃣ Fifth</strong></td>
+                        <td><code>Project Directory</code></td>
+                        <td>Where your code, data, config files live</td>
+                        <td>Varies</td>
+                        <td>1 min</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning">
+                <div class="warning-title">⚠️ Common Mistake:</div>
+                <div class="concept-text">
+                    People try to install Spark before Java. <strong>This won't work!</strong> Spark needs Java to run. Always: Java → Environment Variables → Spark.
+                </div>
+            </div>
+        </div>
+
+        <!-- DIRECTORY STRUCTURE -->
+        <div class="section">
+            <h2>3️⃣ Folder Structure: Where Everything Lives</h2>
+
+            <div class="subsection">
+                <h3>After Setup, Your Disk Will Look Like This:</h3>
+
+                <div class="directory-tree">
+                    <div class="tree-item"><span class="tree-folder">/usr/local/</span> ← System-wide installations</div>
+                    <div class="tree-item" style="margin-left: 40px;"><span class="tree-folder">Cellar/</span></div>
+                    <div class="tree-item" style="margin-left: 60px;"><span class="tree-folder">openjdk/</span> ← Java (installed by Homebrew)</div>
+                    <div class="tree-item" style="margin-left: 60px;"><span class="tree-folder">apache-spark/</span> ← Spark (installed by Homebrew)</div>
+
+                    <br>
+
+                    <div class="tree-item"><span class="tree-folder">$HOME/ (your home directory)</span></div>
+                    <div class="tree-item" style="margin-left: 40px;"><span class="tree-file">.zprofile</span> ← Environment variables added here</div>
+                    <div class="tree-item" style="margin-left: 40px;"><span class="tree-folder">code/</span> ← Your project folder</div>
+                    <div class="tree-item" style="margin-left: 60px;"><span class="tree-folder">spark-learning/</span> ← Your Spark project</div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-folder">data/</span> ← Input data files (CSV, JSON, Parquet)</div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-folder">notebooks/</span> ← Jupyter notebooks for exploration</div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-folder">scripts/</span> ← Python scripts with Spark code</div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-folder">output/</span> ← Results after running jobs</div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-file">requirements.txt</span> ← Python dependencies (pyspark, pandas, etc)</div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-file">config/</span> ← spark-defaults.conf, log4j.properties</div>
+                </div>
+            </div>
+
+            <div class="info">
+                <div class="info-title">💡 Environment Variables Explained</div>
+                <div class="concept-text">
+                    Environment variables are instructions in <code>~/.zprofile</code> that tell your shell (Terminal):
+                    <ul>
+                        <li><code>JAVA_HOME=/path/to/java</code> → "When running Java, use this version"</li>
+                        <li><code>SPARK_HOME=/path/to/spark</code> → "When running Spark, use this directory"</li>
+                        <li><code>PATH=$PATH:$SPARK_HOME/bin</code> → "Add Spark to commands you can run"</li>
+                    </ul>
+                    Without these, Terminal won't know where Java or Spark are!
+                </div>
+            </div>
+        </div>
+
+        <!-- PROJECT FOLDER STRUCTURE -->
+        <div class="section">
+            <h2>4️⃣ Your Project Folder Structure (For L5 Learning)</h2>
+
+            <div class="subsection">
+                <h3>Recommended Organization:</h3>
+
+                <div class="directory-tree">
+                    <div class="tree-item"><span class="tree-folder">~/code/spark-learning/</span></div>
+
+                    <div class="tree-item" style="margin-left: 40px;"><span class="tree-folder">phase-1-spark-internals/</span></div>
+                    <div class="tree-item" style="margin-left: 60px;"><span class="tree-folder">week-1-dag-execution/</span></div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-folder">data/</span></div>
+                    <div class="tree-item" style="margin-left: 100px;"><span class="tree-file">sample.csv</span></div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-folder">scripts/</span></div>
+                    <div class="tree-item" style="margin-left: 100px;"><span class="tree-file">01_basic_dag.py</span></div>
+                    <div class="tree-item" style="margin-left: 100px;"><span class="tree-file">02_analyze_dag.py</span></div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-folder">notebooks/</span></div>
+                    <div class="tree-item" style="margin-left: 100px;"><span class="tree-file">week1_exploration.ipynb</span></div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-folder">output/</span></div>
+                    <div class="tree-item" style="margin-left: 100px;"><span class="tree-file">dag_screenshot.png</span></div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-file">README.md</span></div>
+
+                    <div class="tree-item" style="margin-left: 60px;"><span class="tree-folder">week-2-catalyst-optimizer/</span></div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-folder">scripts/</span></div>
+                    <div class="tree-item" style="margin-left: 100px;"><span class="tree-file">01_explain_analysis.py</span></div>
+
+                    <div class="tree-item" style="margin-left: 40px;"><span class="tree-folder">phase-2-streaming/</span></div>
+                    <div class="tree-item" style="margin-left: 60px;"><span class="tree-folder">week-5-kafka/</span></div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-folder">docker-compose.yml</span> ← Local Kafka setup</div>
+
+                    <div class="tree-item" style="margin-left: 40px;"><span class="tree-folder">projects/</span></div>
+                    <div class="tree-item" style="margin-left: 60px;"><span class="tree-folder">lakehouse-medallion/</span></div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-folder">bronze/</span> ← Raw data</div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-folder">silver/</span> ← Cleaned data</div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-folder">gold/</span> ← Analytics-ready</div>
+                    <div class="tree-item" style="margin-left: 80px;"><span class="tree-file">dbt_project.yml</span></div>
+
+                    <div class="tree-item" style="margin-left: 40px;"><span class="tree-file">requirements.txt</span></div>
+                    <div class="tree-item" style="margin-left: 40px;"><span class="tree-file">.gitignore</span></div>
+                    <div class="tree-item" style="margin-left: 40px;"><span class="tree-file">README.md</span></div>
+                </div>
+            </div>
+
+            <div class="info">
+                <div class="info-title">💡 Folder Naming Convention</div>
+                <div class="concept-text">
+                    <strong>Why this structure?</strong>
+                    <ul>
+                        <li><code>phase-X/</code> - Organize by 12-week program phase</li>
+                        <li><code>week-X/</code> - One folder per week of learning</li>
+                        <li><code>scripts/</code> - Python/Scala files (actual code)</li>
+                        <li><code>notebooks/</code> - Jupyter for exploration and visualization</li>
+                        <li><code>data/</code> - Input datasets (CSV, Parquet, JSON)</li>
+                        <li><code>output/</code> - Results, screenshots, analysis</li>
+                    </ul>
+                    This keeps everything organized and makes it easy to review past work.
+                </div>
+            </div>
+        </div>
+
+        <!-- HOW SPARK WORKS LOCALLY -->
+        <div class="section">
+            <h2>5️⃣ How Spark Runs on Your Machine (Local Mode Explained)</h2>
+
+            <div class="subsection">
+                <h3>Spark Architecture in Local Mode:</h3>
+
+                <div class="flow-diagram">
+                    <strong>Your Python Script</strong>
+                    <span class="arrow">→</span>
+                    <strong>Driver Process</strong> (on your machine)
+                    <span class="arrow">→</span>
+                    <strong>Executor Threads</strong> (on your machine)
+                    <span class="arrow">→</span>
+                    <strong>Results</strong>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Location</th>
+                            <th>What It Does</th>
+                            <th>In Your Setup</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Driver</strong></td>
+                            <td>Your machine</td>
+                            <td>Reads your Python code, creates Spark plan, manages execution</td>
+                            <td>Main Python process</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Executors</strong></td>
+                            <td>Your machine (multiple threads)</td>
+                            <td>Processes data in parallel; actual computation happens here</td>
+                            <td>Multiple CPU threads</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Spark Context</strong></td>
+                            <td>Driver</td>
+                            <td>Entry point to Spark cluster; tells Spark how to access data and resources</td>
+                            <td><code>SparkSession.builder.getOrCreate()</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Memory</strong></td>
+                            <td>Your machine's RAM</td>
+                            <td>Stores DataFrames, intermediate results, shuffle data</td>
+                            <td>Default ~1GB; configurable</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="concept-box">
+                <div class="concept-title">Simple Example: How Your Code Executes</div>
+                <div class="concept-text">
+                    <ol style="margin-left: 20px;">
+                        <li>You run: <code>python my_spark_job.py</code></li>
+                        <li>Python starts; creates Spark session (Driver starts)</li>
+                        <li>Your code creates a DataFrame: <code>df = spark.read.csv("data.csv")</code></li>
+                        <li>You call an action: <code>df.show()</code> (this triggers execution)</li>
+                        <li>Driver creates execution plan → breaks into stages/tasks</li>
+                        <li>Executor threads work in parallel on different partitions</li>
+                        <li>Results come back to Driver; printed to console</li>
+                        <li>Job finishes; Spark session closes</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="warning">
+                <div class="warning-title">⚠️ Key Spark Concept: Lazy Evaluation</div>
+                <div class="concept-text">
+                    When you do <code>df.filter(...).select(...)</code>, Spark doesn't execute immediately. It just builds a plan. Execution only happens when you call an <strong>action</strong> like <code>.show()</code>, <code>.collect()</code>, or <code>.write()</code>. This is why learning the DAG and Catalyst is important!
+                </div>
+            </div>
+        </div>
+
+        <!-- WHAT YOU'LL RUN -->
+        <div class="section">
+            <h2>6️⃣ How You'll Run Your Code (Three Ways)</h2>
+
+            <div class="subsection">
+                <h3>Method 1: Spark Shell (Interactive)</h3>
+                <div class="code-block">
+$ spark-shell  <span class="comment"># Launches Scala REPL</span>
+<span class="comment"># Type Spark code directly; see results immediately</span>
+scala> val df = spark.read.csv("data.csv", header=true)
+scala> df.show()
+<span class="comment"># Great for exploration, understanding DAG via UI</span>
+                </div>
+                <p><strong>Best for:</strong> Learning, debugging, quick exploration</p>
+            </div>
+
+            <div class="subsection">
+                <h3>Method 2: Python Scripts</h3>
+                <div class="code-block">
+<span class="comment"># File: scripts/my_job.py</span>
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .appName("MyJob") \
+    .getOrCreate()
+
+df = spark.read.csv("data.csv", header=True)
+df.show()
+
+<span class="comment"># Run from command line:</span>
+$ spark-submit scripts/my_job.py
+<span class="comment"># Or: python scripts/my_job.py (requires SPARK_HOME in PATH)</span>
+                </div>
+                <p><strong>Best for:</strong> Production jobs, reproducible code, logging, error handling</p>
+            </div>
+
+            <div class="subsection">
+                <h3>Method 3: Jupyter Notebooks</h3>
+                <div class="code-block">
+<span class="comment"># Inside Jupyter notebook cell</span>
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .appName("Notebook") \
+    .getOrCreate()
+
+df = spark.read.csv("data.csv", header=True)
+df.show()  <span class="comment"># Results display below cell</span>
+                </div>
+                <p><strong>Best for:</strong> Data exploration, visualization, documentation, learning</p>
+            </div>
+
+            <div class="info">
+                <div class="info-title">💡 Which Method for L5 Learning?</div>
+                <div class="concept-text">
+                    <ul>
+                        <li><strong>Weeks 1-4 (Spark Internals):</strong> Use <strong>Spark Shell + Jupyter</strong> to analyze EXPLAIN plans and DAGs via Spark UI</li>
+                        <li><strong>Weeks 5-8 (Streaming):</strong> Use <strong>Python scripts</strong> with logging to handle checkpoints, recovery</li>
+                        <li><strong>Weeks 9-12 (System Design):</strong> Use <strong>Python scripts</strong> + documentation for production patterns</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SPARK UI AND MONITORING -->
+        <div class="section">
+            <h2>7️⃣ Spark UI: Visualizing Your Jobs (Critical for Learning)</h2>
+
+            <div class="concept-box">
+                <div class="concept-title">What is Spark UI?</div>
+                <div class="concept-text">
+                    <strong>Spark UI = Web dashboard showing job execution in real-time</strong>
+                    <ul>
+                        <li>See DAG (Directed Acyclic Graph) visualized</li>
+                        <li>Watch stages, tasks, timing, data movement</li>
+                        <li>Understand where time is spent</li>
+                        <li>Identify bottlenecks (shuffles, memory issues)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Accessing Spark UI:</h3>
+                <div class="step">
+                    <strong>Step 1:</strong> Run any Spark job (shell, script, or notebook)
+                </div>
+                <div class="step">
+                    <strong>Step 2:</strong> While job is running (or just finished), open browser
+                </div>
+                <div class="step">
+                    <strong>Step 3:</strong> Go to: <code>http://localhost:4040</code>
+                </div>
+                <div class="step">
+                    <strong>Step 4:</strong> Click on "Jobs" tab to see DAG visualization
+                </div>
+                <div class="success">
+                    <div class="success-title">✅ What You'll See:</div>
+                    <div class="concept-text">
+                        <ul>
+                            <li>Job → Stages (colored boxes)</li>
+                            <li>Stages → Tasks (parallelized work)</li>
+                            <li>Shuffle operations (data movement)</li>
+                            <li>Execution time per stage</li>
+                            <li>Executor memory usage</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="warning">
+                <div class="warning-title">⚠️ Spark UI Tips</div>
+                <div class="concept-text">
+                    <ul>
+                        <li>UI only works while Spark context is alive (job running or just finished)</li>
+                        <li>After job completes, you have ~30 seconds before UI disappears</li>
+                        <li>For analysis, <strong>take screenshots immediately!</strong></li>
+                        <li>Or enable persistent history server (advanced topic)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONFIGURATION FILES -->
+        <div class="section">
+            <h2>8️⃣ Configuration Files (The Config Layer)</h2>
+
+            <div class="subsection">
+                <h3>Three Key Config Files:</h3>
+
+                <div style="margin: 20px 0;">
+                    <p><strong>1. log4j.properties (Logging)</strong></p>
+                    <p style="margin-left: 20px; color: #666; font-size: 13px;">Location: <code>$SPARK_HOME/conf/log4j.properties</code></p>
+                    <div class="code-block">
+<span class="comment"># Controls what messages Spark prints to console/logs</span>
+log4j.rootCategory=WARN, console
+<span class="comment"># Change WARN to INFO to see more details (useful for debugging)</span>
+                    </div>
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <p><strong>2. spark-defaults.conf (Default Settings)</strong></p>
+                    <p style="margin-left: 20px; color: #666; font-size: 13px;">Location: <code>$SPARK_HOME/conf/spark-defaults.conf</code></p>
+                    <div class="code-block">
+<span class="comment"># Sets default values for all Spark jobs</span>
+spark.driver.memory           2g
+spark.executor.memory         2g
+spark.executor.cores          4
+spark.sql.shuffle.partitions  200
+                    </div>
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <p><strong>3. Your Job Config (Inside Python Code)</strong></p>
+                    <div class="code-block">
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .appName("MyJob") \
+    .config("spark.executor.memory", "2g") \
+    .config("spark.executor.cores", "4") \
+    .config("spark.sql.shuffle.partitions", "200") \
+    .getOrCreate()
+                    </div>
+                </div>
+            </div>
+
+            <div class="info">
+                <div class="info-title">💡 Config Priority Order</div>
+                <div class="concept-text">
+                    When you run a Spark job, these override each other:
+                    <ol style="margin-left: 20px;">
+                        <li><code>spark-submit --conf</code> arguments (highest priority)</li>
+                        <li>In-code <code>.config()</code> calls</li>
+                        <li><code>spark-defaults.conf</code></li>
+                        <li>Spark's built-in defaults (lowest priority)</li>
+                    </ol>
+                    For L5 learning, you'll mostly use in-code config for experimentation.
+                </div>
+            </div>
+        </div>
+
+        <!-- WORKFLOW -->
+        <div class="section">
+            <h2>9️⃣ Your Complete Workflow (Day-to-Day)</h2>
+
+            <div class="flow-diagram">
+                <strong>Open Terminal</strong>
+                <span class="arrow">→</span>
+                <strong>Navigate to project</strong>
+                <span class="arrow">→</span>
+                <strong>Write code</strong>
+                <span class="arrow">→</span>
+                <strong>Run script</strong>
+                <span class="arrow">→</span>
+                <strong>Check Spark UI</strong>
+                <span class="arrow">→</span>
+                <strong>Analyze EXPLAIN</strong>
+                <span class="arrow">→</span>
+                <strong>Optimize</strong>
+                <span class="arrow">→</span>
+                <strong>Repeat</strong>
+            </div>
+
+            <div class="subsection">
+                <h3>Example Workflow for Week 1:</h3>
+
+                <div class="step">
+                    <strong>Step 1: Setup</strong>
+                    <div class="code-block">
+cd ~/code/spark-learning/phase-1-spark-internals/week-1-dag-execution
+ls  <span class="comment"># See data/, scripts/, notebooks/ folders</span>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <strong>Step 2: Write Code</strong>
+                    <div class="code-block">
+<span class="comment"># In scripts/01_basic_dag.py</span>
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .appName("DAGExploration") \
+    .config("spark.sql.adaptive.enabled", "false") \
+    .getOrCreate()
+
+df = spark.read.csv("../data/sample.csv", header=True)
+result = df.filter(df.age > 25).select("name", "salary").groupBy("name").count()
+result.show()
+                    </div>
+                </div>
+
+                <div class="step">
+                    <strong>Step 3: Run Job</strong>
+                    <div class="code-block">
+python scripts/01_basic_dag.py
+<span class="comment"># OR: spark-submit scripts/01_basic_dag.py</span>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <strong>Step 4: Analyze in Spark UI</strong>
+                    <div class="code-block">
+<span class="comment"># While job running, open in browser:</span>
+<span class="comment"># http://localhost:4040</span>
+<span class="comment"># Click Jobs → Your Job → DAG Visualization</span>
+<span class="comment"># Take screenshot: identify stages, shuffles, task count</span>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <strong>Step 5: Document Findings</strong>
+                    <div class="code-block">
+<span class="comment"># In output/week1_analysis.md</span>
+Job Name: DAGExploration
+Stages: 2 (read → group by)
+Shuffle: Yes (stage 1 → 2)
+Tasks: 8 total (4 in each stage)
+Time: 2.3 seconds
+Observations: Filter and select are pushed into stage 0 (predicate pushdown)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SETUP CHECKLIST -->
+        <div class="section">
+            <h2>🔟 Pre-Setup Checklist (Before Installing)</h2>
+
+            <div class="checklist">
+                <li><strong>Machine Type:</strong> You have a Mac with M1/M2/M3 or Intel processor</li>
+                <li><strong>Storage:</strong> At least 5GB free disk space (Java + Spark + dependencies)</li>
+                <li><strong>Memory:</strong> At least 8GB RAM (Spark local mode needs ~2GB per default)</li>
+                <li><strong>Terminal Access:</strong> Can open Terminal and run commands</li>
+                <li><strong>Homebrew Installed:</strong> If not, we'll install it (macOS package manager)</li>
+                <li><strong>Internet:</strong> Download packages (~1GB total)</li>
+                <li><strong>Python 3 Installed:</strong> macOS comes with it, but might need to verify</li>
+                <li><strong>Code Editor:</strong> VS Code or similar ready for editing Python files</li>
+            </div>
+
+            <div class="success">
+                <div class="success-title">✅ After Setup You Should Be Able To:</div>
+                <div class="concept-text">
+                    <ul>
+                        <li>Open Terminal and type: <code>spark-shell</code> → Scala REPL starts</li>
+                        <li>Create a Python file, run: <code>spark-submit my_script.py</code> → Job executes</li>
+                        <li>While running, open <code>localhost:4040</code> → See Spark UI</li>
+                        <li>Check Spark version: <code>spark-submit --version</code></li>
+                        <li>Check Java version: <code>java -version</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUMMARY TABLE -->
+        <div class="section">
+            <h2>Summary: Setup at a Glance</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>What</th>
+                        <th>Why</th>
+                        <th>Where It Lives</th>
+                        <th>How You Use It</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Foundation</strong></td>
+                        <td>Java JDK</td>
+                        <td>Spark runs on JVM</td>
+                        <td><code>/usr/local/opt/openjdk</code></td>
+                        <td>Automatic (Spark uses it)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Framework</strong></td>
+                        <td>Spark Binary</td>
+                        <td>Distributed compute engine</td>
+                        <td><code>/usr/local/opt/apache-spark</code></td>
+                        <td><code>spark-shell</code> or <code>spark-submit</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Config</strong></td>
+                        <td>Environment Variables</td>
+                        <td>Tell OS where things are</td>
+                        <td><code>~/.zprofile</code></td>
+                        <td>Set once; system reads on startup</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Development</strong></td>
+                        <td>Python + Libraries</td>
+                        <td>Write PySpark code</td>
+                        <td><code>~/.local/lib/python3.X</code></td>
+                        <td>Import in scripts: <code>from pyspark.sql import SparkSession</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Project</strong></td>
+                        <td>Your Code</td>
+                        <td>Your actual work</td>
+                        <td><code>~/code/spark-learning/</code></td>
+                        <td><code>python scripts/my_job.py</code> or <code>spark-submit</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Monitoring</strong></td>
+                        <td>Spark UI</td>
+                        <td>See job execution visually</td>
+                        <td>Browser: <code>localhost:4040</code></td>
+                        <td>Open during job run; screenshot DAGs</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- NEXT STEPS -->
+        <div class="section" style="background-color: #e8f5e9; border-left-color: #4caf50;">
+            <h2>🎯 Next Steps (Once You Understand This)</h2>
+
+            <div class="success">
+                <div class="success-title">Now That You Understand Setup:</div>
+                <div class="concept-text">
+                    <ol style="margin-left: 20px;">
+                        <li><strong>Review this document</strong> - Make sure all layers are clear</li>
+                        <li><strong>Ask clarification questions</strong> - Any part of the architecture unclear?</li>
+                        <li><strong>Ready to install?</strong> - Say "Start Spark setup" and we'll do it step-by-step</li>
+                        <li><strong>We'll follow this order:</strong>
+                            <ol style="margin-left: 20px;">
+                                <li>Install Homebrew (if needed)</li>
+                                <li>Install Java JDK</li>
+                                <li>Set environment variables</li>
+                                <li>Install Spark</li>
+                                <li>Verify installation</li>
+                                <li>Create project structure</li>
+                                <li>Run first Spark job</li>
+                            </ol>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>📚 Apache Spark Setup Overview | Understanding the complete architecture before installation</p>
+            <p>Next: Actual installation steps (when you're ready)</p>
+        </footer>
+    </div>
+</body>
+</html>

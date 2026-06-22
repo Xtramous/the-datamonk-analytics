@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 2: Spark RDD Architecture - L5 Interview Prep</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; line-height: 1.8; color: #333; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; }
+        header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .content { padding: 40px; }
+        section { margin: 40px 0; page-break-inside: avoid; }
+        h2 { color: #667eea; font-size: 1.8em; border-bottom: 3px solid #667eea; padding-bottom: 10px; margin: 30px 0 20px 0; }
+        h3 { color: #764ba2; font-size: 1.4em; margin: 25px 0 15px 0; }
+        h4 { color: #555; font-size: 1.1em; margin: 15px 0 10px 0; }
+        .box { padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .key-point { background: #fff3cd; border-left: 4px solid #ffc107; }
+        .code { background: #f5f5f5; border-left: 4px solid #ff6b6b; padding: 15px; margin: 20px 0; font-family: monospace; overflow-x: auto; }
+        .diagram { background: #f9f9f9; border: 2px dashed #667eea; padding: 20px; margin: 20px 0; font-family: monospace; white-space: pre-wrap; font-size: 0.9em; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; background: #fff; }
+        th { background: #667eea; color: white; padding: 15px; text-align: left; }
+        td { padding: 12px 15px; border-bottom: 1px solid #ddd; }
+        tr:hover { background: #f5f5f5; }
+        .question { background: #f0f4ff; border-left: 4px solid #667eea; padding: 20px; margin: 20px 0; }
+        .answer { background: #fff9e6; border-left: 4px solid #764ba2; padding: 20px; margin: 15px 0 0 0; }
+        .note { background: #e8f5e9; border-left: 4px solid #4caf50; padding: 15px; margin: 20px 0; }
+        .warning { background: #ffebee; border-left: 4px solid #f44336; padding: 15px; margin: 20px 0; }
+        .badge { display: inline-block; background: #667eea; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.85em; margin: 5px 5px 0 0; }
+        .badge.advanced { background: #ff6b6b; }
+        .performance { background: #e0f2f1; border-left: 4px solid #009688; padding: 15px; margin: 20px 0; }
+        footer { background: #f5f5f5; padding: 20px; text-align: center; border-top: 1px solid #ddd; color: #666; }
+        ul, ol { margin: 15px 0 15px 30px; }
+        li { margin: 8px 0; }
+        p { margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Week 2: Spark RDD Architecture & Core Concepts</h1>
+            <p>Complete Study Material with L5 Interview Questions</p>
+        </header>
+
+        <div class="content">
+            <section>
+                <h2>📖 Table of Contents</h2>
+                <ol>
+                    <li>RDD Fundamentals</li>
+                    <li>Lazy Evaluation & DAG</li>
+                    <li>Transformations vs Actions</li>
+                    <li>Partitioning Strategy</li>
+                    <li>Shuffles & Wide Transformations</li>
+                    <li>Caching & Persistence</li>
+                    <li>Performance Optimization</li>
+                    <li>L5 Interview Questions</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>1️⃣ RDD Fundamentals</h2>
+
+                <h3>What is an RDD?</h3>
+                <p>An <strong>RDD (Resilient Distributed Dataset)</strong> is the fundamental data structure of Apache Spark - an immutable, distributed collection of objects processed in parallel.</p>
+
+                <div class="box key-point">
+                    <strong>4 Core Properties:</strong>
+                    <ul>
+                        <li><strong>Resilient:</strong> Recovers from node failures via lineage</li>
+                        <li><strong>Distributed:</strong> Data split across cluster nodes</li>
+                        <li><strong>Immutable:</strong> Cannot be modified after creation</li>
+                        <li><strong>Lazy:</strong> Computations deferred until action called</li>
+                    </ul>
+                </div>
+
+                <h3>RDD Lineage & Fault Tolerance</h3>
+                <p>Each RDD maintains a reference to its parent RDDs, forming a DAG (Directed Acyclic Graph). If a partition is lost, Spark recomputes it from parent RDDs.</p>
+
+                <div class="diagram">
+┌─────────────────────────────────┐
+│ Original Data (HDFS)            │ ← Data Source
+└────────────────┬────────────────┘
+                 │ (flatMap: narrow transformation)
+                 ▼
+┌─────────────────────────────────┐
+│ RDD1: Flattened (3 partitions)  │ ← Dependencies: [DataSource]
+├─────────────────────────────────┤
+│ [Partition 0] [Partition 1] ... │
+└────────────────┬────────────────┘
+                 │ (filter: narrow)
+                 ▼
+┌─────────────────────────────────┐
+│ RDD2: Filtered (3 partitions)   │ ← Dependencies: [RDD1]
+└────────────────┬────────────────┘
+                 │ (reduceByKey: wide = SHUFFLE!)
+                 ▼
+┌─────────────────────────────────┐
+│ RDD3: Reduced (3 partitions)    │ ← Dependencies: [RDD2]
+└────────────────┬────────────────┘
+                 │ (collect: action)
+                 ▼
+         Results to Driver
+
+If RDD2 Partition 1 is lost:
+  Spark rebuilds from RDD1 Partition 1 → original data
+                </div>
+
+                <h3>5 Key RDD Properties</h3>
+                <table>
+                    <tr><th>Property</th><th>Purpose</th><th>Example</th></tr>
+                    <tr><td><strong>Partitions</strong></td><td>List of partitions RDD is divided into</td><td>List of 4 partitions across 4 nodes</td></tr>
+                    <tr><td><strong>Dependencies</strong></td><td>List of parent RDDs (for lineage)</td><td>[RDD1, RDD2]</td></tr>
+                    <tr><td><strong>Compute</strong></td><td>Function to compute from parents</td><td>lambda x: x * 2</td></tr>
+                    <tr><td><strong>Partitioner</strong></td><td>Partitioning scheme metadata</td><td>HashPartitioner(10)</td></tr>
+                    <tr><td><strong>Preferred Locations</strong></td><td>Data locality hints</td><td>IP addresses of HDFS blocks</td></tr>
+                </table>
+            </section>
+
+            <section>
+                <h2>2️⃣ Lazy Evaluation & DAG</h2>
+
+                <h3>How Lazy Evaluation Works</h3>
+                <p>Transformations don't execute immediately. Spark builds a DAG and optimizes before execution starts when an action is called.</p>
+
+                <div class="code">
+<pre># Timeline of Lazy Execution
+
+from pyspark import SparkContext
+sc = SparkContext("local", "Demo")
+
+# Step 1: Create RDD
+rdd1 = sc.parallelize([1,2,3,4,5])
+print("Created RDD1")  # Prints immediately
+
+# Step 2: Apply map (LAZY - no execution)
+rdd2 = rdd1.map(lambda x: x * 2)
+print("Created RDD2")  # Prints immediately
+
+# Step 3: Apply filter (LAZY - no execution)
+rdd3 = rdd2.filter(lambda x: x > 5)
+print("Created RDD3")  # Prints immediately
+
+# At this point, Spark has NOT computed anything!
+# It's just storing: "Do map, then filter"
+
+# Step 4: Call action (TRIGGERS EXECUTION!)
+result = rdd3.collect()  # NOW everything executes
+print(result)  # [6, 8, 10]</pre>
+                </div>
+
+                <div class="box note">
+                    <strong>Why Lazy Evaluation?</strong>
+                    <ul>
+                        <li>Spark can optimize entire pipeline before execution</li>
+                        <li>Can reorder operations for better performance</li>
+                        <li>Reduces unnecessary intermediate data</li>
+                        <li>Enables intelligent resource allocation</li>
+                    </ul>
+                </div>
+
+                <h3>DAG Visualization</h3>
+                <div class="diagram">
+After rdd3 = rdd2.filter(lambda x: x > 5):
+
+        ┌─────────────────────┐
+        │ Parallelize [1..5]  │
+        │   (Stage 0)         │
+        └──────────┬──────────┘
+                   │
+                   │ map(λx: x*2)
+                   ▼
+        ┌─────────────────────┐
+        │ Map RDD             │ ← Narrow dependency
+        │   (Stage 0)         │   (same partition)
+        └──────────┬──────────┘
+                   │
+                   │ filter(λx: x>5)
+                   ▼
+        ┌─────────────────────┐
+        │ Filter RDD          │ ← Narrow dependency
+        │   (Stage 0)         │   (no shuffle needed)
+        └─────────────────────┘
+
+Graph is still NOT executed!
+When collect() is called, Spark executes this entire DAG.
+                </div>
+            </section>
+
+            <section>
+                <h2>3️⃣ Transformations vs Actions</h2>
+
+                <h3>Transformations (Lazy Operations)</h3>
+                <p>Create a new RDD from an existing one. Never trigger execution.</p>
+
+                <table>
+                    <tr><th>Operation</th><th>Type</th><th>Description</th></tr>
+                    <tr><td>map(f)</td><td>Narrow</td><td>Apply function to each element</td></tr>
+                    <tr><td>filter(f)</td><td>Narrow</td><td>Keep elements where f returns True</td></tr>
+                    <tr><td>flatMap(f)</td><td>Narrow</td><td>Map then flatten results</td></tr>
+                    <tr><td>reduceByKey(f)</td><td>Wide</td><td>Aggregate values by key (SHUFFLE!)</td></tr>
+                    <tr><td>groupByKey()</td><td>Wide</td><td>Group by key (SHUFFLE!)</td></tr>
+                    <tr><td>join(other)</td><td>Wide</td><td>Inner join (SHUFFLE!)</td></tr>
+                    <tr><td>distinct()</td><td>Wide</td><td>Remove duplicates (SHUFFLE!)</td></tr>
+                    <tr><td>union(other)</td><td>Narrow</td><td>Combine two RDDs</td></tr>
+                </table>
+
+                <h3>Actions (Trigger Execution)</h3>
+                <p>Return results to driver or write to storage. These ALWAYS trigger computation.</p>
+
+                <table>
+                    <tr><th>Action</th><th>Returns</th><th>Purpose</th><th>Risk</th></tr>
+                    <tr><td>collect()</td><td>Array</td><td>Fetch all to driver</td><td>OOM if too much data</td></tr>
+                    <tr><td>count()</td><td>Long</td><td>Number of elements</td><td>Safe</td></tr>
+                    <tr><td>first()</td><td>T</td><td>First element</td><td>Safe</td></tr>
+                    <tr><td>take(n)</td><td>Array</td><td>First n elements</td><td>Safe if n small</td></tr>
+                    <tr><td>saveAsTextFile()</td><td>Unit</td><td>Write to HDFS</td><td>Safe</td></tr>
+                    <tr><td>reduce(f)</td><td>T</td><td>Aggregate all</td><td>Safe</td></tr>
+                </table>
+
+                <div class="box warning">
+                    <strong>⚠️ Be Careful with collect()!</strong>
+                    <p>If your RDD has 1 billion rows, collect() will try to load ALL of them into driver memory and crash!</p>
+                    <p>Use take(10), first(), or saveAsTextFile() instead.</p>
+                </div>
+            </section>
+
+            <section>
+                <h2>4️⃣ Partitioning Strategy</h2>
+
+                <h3>Why Partitioning Matters</h3>
+                <p>Partitions enable parallel processing. Each partition is processed by a different executor simultaneously.</p>
+
+                <div class="diagram">
+Cluster with 4 nodes:
+
+Input: [1,2,3,4,5,6,7,8,9,10,11,12]
+
+Partitioned into 4 partitions:
+
+Node 1          Node 2          Node 3         Node 4
+┌──────────┐    ┌──────────┐    ┌────────┐    ┌──────────┐
+│Executor 1│    │Executor 2│    │Executor│    │Executor 4│
+│Part. 0   │    │Part. 1   │    │Part. 2 │    │Part. 3   │
+│[1,2,3]   │    │[4,5,6]   │    │[7,8,9] │    │[10,11,12]│
+└──────────┘    └──────────┘    └────────┘    └──────────┘
+
+When map(λx: x*2) is called:
+
+map()  →  map()  →  map()  →  map()
+  ↓        ↓         ↓         ↓
+[2,4,6] [8,10,12] [14,16,18] [20,22,24]
+
+All 4 execute IN PARALLEL! (if 4 cores available)
+
+Execution time ≈ max(partition processing time)
+NOT sequential sum!
+                </div>
+
+                <h3>Optimal Number of Partitions</h3>
+                <table>
+                    <tr><th>Too Few Partitions</th><th>Too Many Partitions</th><th>Optimal</th></tr>
+                    <tr><td>Underutilized cores</td><td>Task scheduling overhead</td><td>Matches cluster cores</td></tr>
+                    <tr><td>Risk of OOM per partition</td><td>More shuffle overhead</td><td>Balanced memory</td></tr>
+                    <tr><td>Slower processing</td><td>More small files on disk</td><td>Better throughput</td></tr>
+                </table>
+
+                <div class="code">
+<pre># Optimal partition count
+num_cores = 8  # your cluster
+num_partitions = num_cores * 2  # Rule of thumb
+
+# Or match your file size
+rdd = sc.textFile("hdfs://path", minPartitions=16)
+
+# Re-partition if needed
+rdd_repartitioned = rdd.repartition(20)  # Triggers SHUFFLE</pre>
+                </div>
+
+                <h3>Partitioner Types</h3>
+                <table>
+                    <tr><th>Partitioner</th><th>Formula</th><th>Use Case</th></tr>
+                    <tr><td>HashPartitioner</td><td>partition = hash(key) % n</td><td>Random key distribution</td></tr>
+                    <tr><td>RangePartitioner</td><td>Ranges: [0-100], [101-200]...</td><td>Sorted data</td></tr>
+                    <tr><td>Custom</td><td>Override partition(key)</td><td>Domain-specific logic</td></tr>
+                </table>
+            </section>
+
+            <section>
+                <h2>5️⃣ Shuffles & Wide Transformations</h2>
+
+                <h3>What is a Shuffle?</h3>
+                <p>A shuffle is network communication where data moves between partitions. It's expensive because it involves disk I/O and network transfer.</p>
+
+                <div class="diagram">
+Shuffle Operation: reduceByKey
+
+Input RDD (3 partitions):
+┌──────────────────────────┐
+│ Partition 0: (a,1), (c,1)│
+│ Partition 1: (a,2), (b,3)│
+│ Partition 2: (b,1), (a,5)│
+└──────────────────────────┘
+              │
+              │ (reduceByKey)
+              │ SHUFFLE happens here!
+              ▼
+Map Phase: Group by key
+┌──────────────────────────┐
+│ Partition 0: (a,1), (a,5)│ ← All 'a's collected
+│ Partition 1: (b,3), (b,1)│ ← All 'b's collected
+│ Partition 2: (c,1)       │ ← All 'c's collected
+└──────────────────────────┘
+              │
+              ▼ (reduce step)
+┌──────────────────────────┐
+│ Partition 0: (a, 8)      │ ← 1+2+5
+│ Partition 1: (b, 4)      │ ← 3+1
+│ Partition 2: (c, 1)      │ ← 1
+└──────────────────────────┘
+
+This network communication is EXPENSIVE!
+                </div>
+
+                <h3>Narrow vs Wide Dependencies</h3>
+                <table>
+                    <tr><th>Aspect</th><th>Narrow</th><th>Wide</th></tr>
+                    <tr><td>Data Movement</td><td>None (within executor)</td><td>Across network (SHUFFLE)</td></tr>
+                    <tr><td>Performance</td><td>Fast</td><td>Slow</td></tr>
+                    <tr><td>Examples</td><td>map, filter, flatMap</td><td>reduceByKey, join, groupBy</td></tr>
+                    <tr><td>Fault Recovery</td><td>Single parent recomputed</td><td>All parents must recompute</td></tr>
+                    <tr><td>Stage Boundary</td><td>No</td><td>Yes (new stage)</td></tr>
+                </table>
+
+                <h3>Wide Transformation Operations</h3>
+                <ul>
+                    <li><code>reduceByKey(f)</code> - Aggregate values by key</li>
+                    <li><code>groupByKey()</code> - Group values by key</li>
+                    <li><code>sortByKey()</code> - Sort by key</li>
+                    <li><code>join(other)</code> - Join two RDDs</li>
+                    <li><code>leftOuterJoin(other)</code> - Left join</li>
+                    <li><code>distinct()</code> - Remove duplicates</li>
+                    <li><code>repartition(n)</code> - Change partition count</li>
+                </ul>
+
+                <div class="code">
+<pre># Wide transformations trigger shuffles
+
+# Example: Count words
+words_rdd = sc.textFile("words.txt")  # narrow
+word_pairs = words_rdd.map(lambda w: (w, 1))  # narrow
+
+# THIS IS A SHUFFLE!
+word_counts = word_pairs.reduceByKey(lambda x,y: x+y)  # WIDE
+
+# Result: Data shuffled across network to group same keys together</pre>
+                </div>
+            </section>
+
+            <section>
+                <h2>6️⃣ Caching & Persistence</h2>
+
+                <h3>Why Cache?</h3>
+                <p>If you use the same RDD multiple times, cache it to avoid recomputation.</p>
+
+                <div class="code">
+<pre># Without cache: recomputes twice
+filtered = rdd.filter(lambda x: x > 5)
+count = filtered.count()      # Computes filtered
+avg = filtered.map(lambda x: x).sum() / count  # Recomputes filtered!
+
+# With cache: computes once, reused
+filtered = rdd.filter(lambda x: x > 5).cache()
+count = filtered.count()      # Computes and caches
+avg = filtered.map(lambda x: x).sum() / count  # Uses cache</pre>
+                </div>
+
+                <h3>Storage Levels</h3>
+                <table>
+                    <tr><th>Level</th><th>Memory</th><th>Disk</th><th>CPU Time</th><th>Use Case</th></tr>
+                    <tr><td>MEMORY_ONLY</td><td>✓</td><td>✗</td><td>Low</td><td>Fits in memory</td></tr>
+                    <tr><td>MEMORY_AND_DISK</td><td>✓</td><td>✓</td><td>Low</td><td>May spill to disk</td></tr>
+                    <tr><td>DISK_ONLY</td><td>✗</td><td>✓</td><td>Medium</td><td>Large data</td></tr>
+                    <tr><td>MEMORY_ONLY_2</td><td>✓</td><td>✗</td><td>Low</td><td>Replicated (fault tolerant)</td></tr>
+                </table>
+
+                <div class="code">
+<pre>from pyspark import StorageLevel
+
+# Different ways to cache
+rdd.cache()  # Same as persist(MEMORY_ONLY)
+rdd.persist(StorageLevel.MEMORY_AND_DISK)  # Can spill to disk
+rdd.persist(StorageLevel.DISK_ONLY)  # Only disk
+
+# Remove from cache
+rdd.unpersist()  # Free up memory/disk</pre>
+                </div>
+            </section>
+
+            <section>
+                <h2>7️⃣ Performance Optimization</h2>
+
+                <h3>Key Bottlenecks</h3>
+                <ul>
+                    <li><strong>Shuffles:</strong> Network I/O - minimize wide transformations</li>
+                    <li><strong>Skew:</strong> Some partitions take much longer (uneven data)</li>
+                    <li><strong>Memory:</strong> OOM errors from large partitions or collect()</li>
+                    <li><strong>Data Serialization:</strong> Slow serialization format</li>
+                </ul>
+
+                <h3>Optimization Techniques</h3>
+                <table>
+                    <tr><th>Problem</th><th>Solution</th></tr>
+                    <tr><td>Too many shuffles</td><td>Combine transformations, use reduceByKey instead of groupByKey</td></tr>
+                    <tr><td>Skewed data</td><td>Re-partition with salted keys or custom partitioner</td></tr>
+                    <tr><td>Reusing RDD</td><td>Cache intermediate results with .cache()</td></tr>
+                    <tr><td>Memory pressure</td><td>Increase partition count, decrease batch size</td></tr>
+                    <tr><td>Slow serialization</td><td>Use Kryo serializer instead of default</td></tr>
+                </table>
+
+                <div class="code">
+<pre># Optimization example: reduceByKey vs groupByKey
+
+# Inefficient (multiple shuffles)
+grouped = rdd.groupByKey()
+summed = grouped.map(lambda kv: (kv[0], sum(kv[1])))
+
+# Efficient (single shuffle with partial aggregation)
+summed = rdd.reduceByKey(lambda x, y: x + y)
+# reduceByKey does local reduction first, then shuffle!</pre>
+                </div>
+            </section>
+
+            <section>
+                <h2>8️⃣ L5 Interview Questions</h2>
+
+                <div class="question">
+                    <h3>Q1: Design & Architecture</h3>
+                    <p class="question"><strong>Question:</strong> Explain how Spark achieves fault tolerance. If an executor crashes with 10 partitions of data, how does Spark recover?</p>
+                    <div class="answer">
+                        <h4>Answer (L5 Level):</h4>
+                        <p>Spark's fault tolerance is built on <strong>RDD lineage</strong> - every RDD knows its parent and the transformation applied.</p>
+
+                        <strong>Recovery Process:</strong>
+                        <ol>
+                            <li><strong>Detection:</strong> Heartbeat mechanism detects executor failure (default ~15s)</li>
+                            <li><strong>Lineage Tracking:</strong> Task scheduler identifies lost partitions of the failed RDD</li>
+                            <li><strong>DAG Recomputation:</strong> Traces back through parent RDDs to find reusable partitions</li>
+                            <li><strong>Rescheduling:</strong> Recomputes only lost partitions (not entire RDD) on healthy executors</li>
+                            <li><strong>Data Locality:</strong> Prefers hosts where parent data is cached/stored</li>
+                        </ol>
+
+                        <strong>Example:</strong>
+                        <div class="code">
+<pre>RDD1 (HDFS) → map() → RDD2 → filter() → RDD3 → reduce()
+              ↑ Parent is HDFS (immutable, always available)
+
+If executor with RDD3 partitions crashes:
+1. Task scheduler identifies "RDD3 partition 2" lost
+2. Traces: RDD3 depends on RDD2 partition 2
+3. Traces: RDD2 depends on RDD1 partition 2
+4. Traces: RDD1 comes from HDFS (resides on disk)
+5. Recomputes: HDFS block → map() → filter() → RDD3 partition 2
+6. Schedules on healthy executor with data locality</pre>
+                        </div>
+
+                        <strong>Advanced Considerations:</strong>
+                        <ul>
+                            <li><strong>Shuffle data:</strong> Lost shuffle data requires recomputing parent (expensive!)</li>
+                            <li><strong>ExternalShuffleService:</strong> Can preserve shuffle data across executor restarts</li>
+                            <li><strong>Replication levels:</strong> persist(MEMORY_ONLY_2) keeps 2 copies for faster recovery</li>
+                            <li><strong>Node failure vs task failure:</strong> Task retries (max 3), node failure triggers full stage recomputation</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>Q2: Performance & Optimization</h3>
+                    <p class="question"><strong>Question:</strong> You're analyzing 100GB of data with a 8-core cluster. After initial filtering, you get 5GB. You need to call distinct() and then collect(). Design this pipeline for optimal performance.</p>
+                    <div class="answer">
+                        <h4>Answer (L5 Level):</h4>
+
+                        <strong>Bad Approach:</strong>
+                        <div class="code">
+<pre>rdd = sc.textFile("data/100GB")  # Creates many partitions
+filtered = rdd.filter(...)       # Narrow, keeps partitions
+distinct = filtered.distinct()   # WIDE - heavy shuffle!
+result = distinct.collect()      # OOM - tries to load 5GB into memory</pre>
+                        </div>
+
+                        <strong>Optimized Approach:</strong>
+                        <div class="code">
+<pre>rdd = sc.textFile("data/100GB", minPartitions=32)  # 4 × cores
+
+# Filter reduces data
+filtered = rdd.filter(...)  # 100GB → 5GB
+
+# Before distinct, reduce partitions & cache intermediate
+cached = filtered.repartition(8).cache()
+
+# distinct on smaller data
+distinct = cached.distinct()
+
+# Safe collect - only 5GB, and distinct likely reduces further
+result = distinct.take(1000)  # Use take() instead of collect()!
+# or save to disk instead
+distinct.saveAsTextFile("output/")</pre>
+                        </div>
+
+                        <strong>Why This Works:</strong>
+                        <ul>
+                            <li><strong>minPartitions:</strong> Utilizes all 8 cores effectively</li>
+                            <li><strong>repartition(8):</strong> Matches cluster capacity after filtering</li>
+                            <li><strong>cache():</strong> If reused, speeds up distinct()</li>
+                            <li><strong>take() not collect():</strong> Avoids loading all into memory</li>
+                            <li><strong>Partition count reduction:</strong> Reduces shuffle overhead in distinct()</li>
+                        </ul>
+
+                        <strong>Advanced Points:</strong>
+                        <ul>
+                            <li>Shuffle partitions for distinct() should be 2-3x larger than final partitions</li>
+                            <li>Monitor executor memory with web UI - look for GC pauses</li>
+                            <li>If distinct() causes OOM, use coalesce() or increase partitions further</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>Q3: Data Skew & Real-World Problems</h3>
+                    <p class="question"><strong>Question:</strong> You're doing a reduceByKey() on user IDs. 30% of data is from one user (skew). Job takes 10x longer than expected. How do you diagnose and fix?</p>
+                    <div class="answer">
+                        <h4>Answer (L5 Level):</h4>
+
+                        <strong>Diagnosis:</strong>
+                        <div class="code">
+<pre># Check for skew
+key_distribution = rdd.map(lambda (k,v): (k, 1)) \
+                     .reduceByKey(lambda x,y: x+y) \
+                     .map(lambda (k,count): count) \
+                     .stats()
+
+print(f"Max: {key_distribution.max()}, Mean: {key_distribution.mean()}")</pre>
+                        </div>
+
+                        <strong>Solutions (In Order of Preference):</strong>
+
+                        <strong>1. Salting (Most Common):</strong>
+                        <div class="code">
+<pre># Add random salt to heavy keys
+import random
+
+def add_salt(k_v):
+    k, v = k_v
+    if k == "heavy_user":  # Known heavy key
+        salt = random.randint(0, 9)
+        return (f"{k}_{salt}", v)
+    return (k, v)
+
+salted = rdd.map(add_salt).reduceByKey(lambda x,y: x+y)
+
+# Then remove salt
+result = salted.map(lambda (k,v): (k.split('_')[0], v)) \
+               .reduceByKey(lambda x,y: x+y)</pre>
+                        </div>
+
+                        <strong>2. Isolation (For Single Heavy Key):</strong>
+                        <div class="code">
+<pre"># Separate heavy key from others
+heavy = rdd.filter(lambda (k,v): k == "heavy_user") \
+            .reduceByKey(lambda x,y: x+y)
+
+light = rdd.filter(lambda (k,v): k != "heavy_user") \
+            .reduceByKey(lambda x,y: x+y)
+
+result = heavy.union(light)</pre>
+                        </div>
+
+                        <strong>3. Custom Partitioner:</strong>
+                        <div class="code">
+<pre>class SkewPartitioner(Partitioner):
+    def numPartitions(self):
+        return 100
+
+    def getPartition(self, key):
+        if key == "heavy_user":
+            # Spread heavy key across 20 partitions
+            return hash(str(random.randint(0, 19))) % 20
+        return hash(key) % 80
+
+rdd.repartitionAndSortWithinPartitions(SkewPartitioner())</pre>
+                        </div>
+
+                        <strong>Why Skew Happens:</strong>
+                        <ul>
+                            <li>All values for one key go to ONE partition (hash(key) determines partition)</li>
+                            <li>That partition takes 10x longer than others</li>
+                            <li>Job time = max(partition times) → bottlenecked by one partition</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>Q4: Complex Scenario - Multi-Stage Pipeline</h3>
+                    <p class="question"><strong>Question:</strong> Design a pipeline that reads 500GB of clickstream data, filters to specific region, deduplicates, joins with user master data (50MB), and outputs to Parquet. How do you ensure it runs efficiently?</p>
+                    <div class="answer">
+                        <h4>Answer (L5 Level):</h4>
+
+                        <strong>Optimized Pipeline:</strong>
+                        <div class="code">
+<pre">from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .appName("ClickstreamPipeline") \
+    .config("spark.sql.shuffle.partitions", "200") \
+    .config("spark.default.parallelism", "200") \
+    .getOrCreate()
+
+# Stage 1: Read & Filter (push filtering to read)
+clicks = spark.read.parquet("data/clicks") \
+    .filter("region = 'US'")  # Pushed to scan level
+
+# Stage 2: Deduplicate (wide transformation)
+clicks_distinct = clicks.dropDuplicates(["click_id"])
+
+# Stage 3: Broadcast small dataset for join
+user_master = spark.read.parquet("data/users").cache()
+# Size: 50MB < 128MB broadcast limit (safe!)
+
+# Stage 4: Broadcast join (efficient!)
+result = clicks_distinct.join(
+    broadcast(user_master),
+    "user_id"
+)
+
+# Stage 5: Write (optimized format)
+result.coalesce(50) \  # Reduce files
+    .write.mode("overwrite") \
+    .parquet("output/results")</pre>
+                        </div>
+
+                        <strong>Key Optimization Decisions:</strong>
+                        <ul>
+                            <li><strong>Filter at read time:</strong> Parquet pushdown reads only necessary data</li>
+                            <li><strong>Small dataset broadcast:</strong> 50MB < 128MB → no shuffle join</li>
+                            <li><strong>cache() on small data:</strong> If user_master is used elsewhere</li>
+                            <li><strong>shuffle.partitions=200:</strong> 500GB / 200 = 2.5GB per partition (safe from OOM)</li>
+                            <li><strong>coalesce(50):</strong> 50 output files (not one per partition)</li>
+                        </ul>
+
+                        <strong>What Happens at Each Stage:</strong>
+                        <ol>
+                            <li>Read: Only "region='US'" rows loaded from HDFS</li>
+                            <li>Filter: In-memory filtering of 500GB down to ~50GB</li>
+                            <li>Deduplicate: WIDE - 50GB shuffled to group same click_ids</li>
+                            <li>Broadcast Join: 50MB copied to all executors, NARROW join with clicks_distinct</li>
+                            <li>Coalesce: 200 partitions → 50 output files (1 reducer per 4 partitions)</li>
+                        </ol>
+
+                        <strong>Performance Metrics:</strong>
+                        <ul>
+                            <li>Expected duration: 15-30 minutes (depends on cluster size)</li>
+                            <li>Network traffic: Primarily stage 2 shuffle (50GB) and stage 5 write</li>
+                            <li>Memory: 2.5GB/partition fits in typical 4-8GB executor memory</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <h3>Q5: Deep Dive - Lineage & Recovery</h3>
+                    <p class="question"><strong>Question:</strong> Explain the difference between narrow and wide dependencies. How does this affect job recovery and scheduling?</p>
+                    <div class="answer">
+                        <h4>Answer (L5 Level):</h4>
+
+                        <strong>Dependency Types:</strong>
+                        <table>
+                            <tr><th>Aspect</th><th>Narrow</th><th>Wide</th></tr>
+                            <tr><td>Data Flow</td><td>1 input partition → 1 output partition</td><td>N input partitions → M output partitions</td></tr>
+                            <tr><td>Example</td><td>map(), filter(), flatMap()</td><td>reduceByKey(), join(), groupByKey()</td></tr>
+                            <tr><td>Network</td><td>None (local to executor)</td><td>All-to-all shuffle (expensive!)</td></tr>
+                            <tr><td>Stage Boundary</td><td>No - same stage</td><td>Yes - new stage created</td></tr>
+                            <tr><td>Recovery</td><td>One parent recomputed</td><td>All parents recomputed</td></tr>
+                        </table>
+
+                        <strong>DAG Visualization:</strong>
+                        <div class="diagram">
+Narrow Dependencies:
+    RDD1 (3 partitions)
+         │ map
+         ▼
+    RDD2 (3 partitions)  ← Each partition directly from one RDD1 partition
+         │ filter
+         ▼
+    RDD3 (3 partitions)
+
+Stage: 1 (single stage, can execute together)
+
+Wide Dependencies:
+    RDD1 (3 parts)          RDD2 (3 parts)
+         │                       │
+         │ reduce by key         │ map
+         └───────┬───────────────┘
+                 │ SHUFFLE!
+                 ▼
+            RDD3 (4 parts)
+
+Stages: 2 (RDD1→RDD2 shuffle, then map)
+                        </div>
+
+                        <strong>Impact on Job Scheduling:</strong>
+                        <ol>
+                            <li><strong>Stage Boundaries:</strong> New stage created after wide dependency</li>
+                            <li><strong>Task Scheduling:</strong> All tasks in stage 1 must complete before stage 2 starts</li>
+                            <li><strong>Shuffle Wait:</strong> Executors wait for all mappers to finish before reducers start</li>
+                            <li><strong>Slow Stragglers:</strong> One slow partition in map phase blocks entire reduce phase</li>
+                        </ol>
+
+                        <strong>Recovery Scenarios:</strong>
+                        <div class="code">
+<pre"># Scenario: Executor with RDD3 partitions crashes
+
+Narrow: RDD1 → map → RDD2 → filter → RDD3
+        If RDD3 partition lost:
+        → Only recompute: filter(RDD2 partition)
+        → RDD2 partition was computed, still in cache/memory elsewhere
+        → FAST recovery
+
+Wide: RDD1 → reduce → RDD2
+      If RDD2 partition lost:
+      → Must recompute: reduce(RDD1 partitions)
+      → But RDD1 comes from HDFS (preserved)
+      → Entire reduce phase must run again
+      → SLOWER recovery</pre>
+                        </div>
+
+                        <strong>Optimization Insight:</strong>
+                        <p>Minimize wide transformations early in pipeline. Chain narrow operations together.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>📝 Practice Exercises</h2>
+
+                <div class="question">
+                    <h3>Exercise 1: Optimize a Slow Job</h3>
+                    <p>You have a job that processes 1TB of logs. It reads the data, filters to specific date range, then does a groupByKey() and join with a 500MB reference table. The job takes 2 hours. Identify optimization opportunities.</p>
+                </div>
+
+                <div class="question">
+                    <h3>Exercise 2: Design for Scale</h3>
+                    <p>Design a Spark pipeline that processes incoming JSON events (1 million/second), deduplicates, enriches with user data, and outputs to a data warehouse. What partition count? Caching strategy? Shuffle strategy?</p>
+                </div>
+
+                <div class="question">
+                    <h3>Exercise 3: Troubleshoot OOM</h3>
+                    <p>A Spark job crashes with OutOfMemoryError on 100GB dataset with 8 executors (4GB memory each). The job does: filter → distinct → collect(). Debug this step-by-step.</p>
+                </div>
+            </section>
+
+            <footer>
+                <h3>Week 2 Summary</h3>
+                <p>Master these concepts to succeed at L5 interviews:</p>
+                <ul style="text-align: left; display: inline-block;">
+                    <li>RDD lineage and fault tolerance mechanism</li>
+                    <li>Lazy evaluation and DAG optimization</li>
+                    <li>Narrow vs wide transformations and stages</li>
+                    <li>Partitioning strategy and data skew handling</li>
+                    <li>Shuffle operations and network I/O patterns</li>
+                    <li>Caching strategies and memory management</li>
+                    <li>Real-world performance optimization techniques</li>
+                </ul>
+                <p style="margin-top: 20px; font-size: 0.9em;">Last Updated: 2026 | Next: Week 3 - DataFrames & SQL Optimization</p>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>

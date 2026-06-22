@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metrics Platform - System Design Infographic</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .infographic {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        header p { font-size: 1.1em; opacity: 0.95; }
+
+        .content {
+            padding: 40px;
+        }
+
+        /* MAIN DIAGRAM */
+        .diagram-container {
+            position: relative;
+            margin: 40px 0;
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 40px;
+            border: 2px solid #e7f0ff;
+        }
+
+        .flow-section {
+            margin: 30px 0;
+        }
+
+        .flow-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stages {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stage-box {
+            background: white;
+            border: 3px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stage-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        .stage-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .stage-name {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .stage-detail {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .stage-cost {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #4caf50;
+            font-size: 0.95em;
+        }
+
+        /* Color coding for stages */
+        .ingestion { border-left: 5px solid #2196F3; }
+        .ingestion .stage-name { color: #2196F3; }
+
+        .processing { border-left: 5px solid #9c27b0; }
+        .processing .stage-name { color: #9c27b0; }
+
+        .storage { border-left: 5px solid #4caf50; }
+        .storage .stage-name { color: #4caf50; }
+
+        .cache { border-left: 5px solid #ff9800; }
+        .cache .stage-name { color: #ff9800; }
+
+        .query { border-left: 5px solid #ff6b6b; }
+        .query .stage-name { color: #ff6b6b; }
+
+        .monitor { border-left: 5px solid #f44336; }
+        .monitor .stage-name { color: #f44336; }
+
+        .arrow {
+            text-align: center;
+            font-size: 2em;
+            color: #667eea;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        /* Parallel paths */
+        .parallel-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .path {
+            background: linear-gradient(to bottom, rgba(244, 67, 54, 0.05), rgba(76, 175, 80, 0.05));
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px dashed #667eea;
+        }
+
+        .path-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .path.realtime .path-title {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .path.batch .path-title {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        /* Metrics boxes */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .metric-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+        }
+
+        .metric-number {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            font-size: 1em;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Cost breakdown */
+        .cost-section {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px 0;
+        }
+
+        .cost-section h3 {
+            color: #2e7d32;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .cost-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .cost-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #4caf50;
+        }
+
+        .cost-amount {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .cost-name {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .cost-total {
+            grid-column: 1 / -1;
+            background: #4caf50;
+            color: white;
+            padding: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        /* Scaling timeline */
+        .scaling-section {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px 0;
+        }
+
+        .scaling-section h3 {
+            color: #1565c0;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .timeline-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #2196F3;
+        }
+
+        .timeline-time {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
+
+        .timeline-metrics {
+            font-size: 0.95em;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .timeline-cost {
+            font-weight: bold;
+            color: #4caf50;
+            font-size: 1em;
+        }
+
+        /* Key features */
+        .features-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .feature-box {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .feature-desc {
+            font-size: 0.95em;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin: 40px 0;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+        }
+
+        .legend-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* Footer */
+        footer {
+            background: #f5f5f5;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+        }
+
+        footer p {
+            color: #666;
+            margin: 5px 0;
+        }
+
+        @media (max-width: 1024px) {
+            .parallel-container {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="infographic">
+        <header>
+            <h1>📊 Metrics Platform - System Design Infographic</h1>
+            <p>1000+ Metrics | 100 Concurrent Users | <100ms Real-time | <500ms Analytical | 2-Year Retention</p>
+        </header>
+
+        <div class="content">
+            <!-- LEGEND -->
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #2196F3;"></div>
+                    <span class="legend-label">Ingestion</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #9c27b0;"></div>
+                    <span class="legend-label">Processing</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #4caf50;"></div>
+                    <span class="legend-label">Storage</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ff9800;"></div>
+                    <span class="legend-label">Caching</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ff6b6b;"></div>
+                    <span class="legend-label">Query APIs</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f44336;"></div>
+                    <span class="legend-label">Monitoring</span>
+                </div>
+            </div>
+
+            <!-- MAIN ARCHITECTURE FLOW -->
+            <div class="diagram-container">
+                <div class="flow-section">
+                    <div class="flow-title">⏱️ DATA INGESTION & SOURCES</div>
+                    <div class="stages">
+                        <div class="stage-box ingestion">
+                            <div class="stage-icon">📱</div>
+                            <div class="stage-name">Apps & Services</div>
+                            <div class="stage-detail">Generate 100K events/min</div>
+                        </div>
+                        <div class="stage-box ingestion">
+                            <div class="stage-icon">🚀</div>
+                            <div class="stage-name">Kafka</div>
+                            <div class="stage-detail">7-day retention, partition by metric_id</div>
+                            <div class="stage-cost">$3K/mo</div>
+                        </div>
+                        <div class="stage-box ingestion">
+                            <div class="stage-icon">📋</div>
+                            <div class="stage-name">Schema Registry</div>
+                            <div class="stage-detail">Version control, validation</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow">⬇️⬇️⬇️ SPLITS INTO TWO PARALLEL PATHS ⬇️⬇️⬇️</div>
+
+                <!-- PARALLEL PATHS -->
+                <div class="parallel-container">
+                    <!-- REAL-TIME PATH -->
+                    <div class="path realtime">
+                        <div class="path-title">🟢 REAL-TIME PATH (Dashboards)</div>
+
+                        <div class="flow-section">
+                            <div class="flow-title" style="font-size: 1.1em;">⚙️ Stream Processing</div>
+                            <div class="stages">
+                                <div class="stage-box processing">
+                                    <div class="stage-icon">⚡</div>
+                                    <div class="stage-name">Flink</div>
+                                    <div class="stage-detail">15-30s windows, RocksDB state</div>
+                                    <div class="stage-cost">$8K/mo</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="arrow">↓</div>
+
+                        <div class="flow-section">
+                            <div class="flow-title" style="font-size: 1.1em;">💾 Hot Storage</div>
+                            <div class="stages">
+                                <div class="stage-box storage">
+                                    <div class="stage-icon">🔥</div>
+                                    <div class="stage-name">Redis TimeSeries</div>
+                                    <div class="stage-detail">7 days | &lt;5ms latency</div>
+                                    <div class="stage-cost">$5K/mo</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="arrow">↓</div>
+
+                        <div class="flow-section">
+                            <div class="flow-title" style="font-size: 1.1em;">⚡ Query Layer</div>
+                            <div class="stages">
+                                <div class="stage-box cache">
+                                    <div class="stage-icon">💨</div>
+                                    <div class="stage-name">Memcached</div>
+                                    <div class="stage-detail">70% hit rate, 5min TTL</div>
+                                </div>
+                                <div class="stage-box query">
+                                    <div class="stage-icon">🔌</div>
+                                    <div class="stage-name">FastAPI</div>
+                                    <div class="stage-detail">&lt;100ms SLA</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="arrow">↓</div>
+
+                        <div class="flow-section">
+                            <div class="flow-title" style="font-size: 1.1em;">📊 Dashboard</div>
+                            <div class="stages">
+                                <div class="stage-box" style="border-left: 5px solid #667eea;">
+                                    <div class="stage-icon">📈</div>
+                                    <div class="stage-name">Real-time Dashboard</div>
+                                    <div class="stage-detail">1-2 min latency</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BATCH PATH -->
+                    <div class="path batch">
+                        <div class="path-title">🔵 BATCH PATH (Correctness)</div>
+
+                        <div class="flow-section">
+                            <div class="flow-title" style="font-size: 1.1em;">⚙️ Batch Processing</div>
+                            <div class="stages">
+                                <div class="stage-box processing">
+                                    <div class="stage-icon">⚡</div>
+                                    <div class="stage-name">Spark</div>
+                                    <div class="stage-detail">Nightly, exactly-once, 24hr late window</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="arrow">↓</div>
+
+                        <div class="flow-section">
+                            <div class="flow-title" style="font-size: 1.1em;">💾 Cold Storage</div>
+                            <div class="stages">
+                                <div class="stage-box storage">
+                                    <div class="stage-icon">❄️</div>
+                                    <div class="stage-name">Snowflake</div>
+                                    <div class="stage-detail">2 years | &lt;500ms queries</div>
+                                    <div class="stage-cost">$6K/mo</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="arrow">↓</div>
+
+                        <div class="flow-section">
+                            <div class="flow-title" style="font-size: 1.1em;">🔄 Transformation</div>
+                            <div class="stages">
+                                <div class="stage-box storage">
+                                    <div class="stage-icon">dbt</div>
+                                    <div class="stage-name">dbt</div>
+                                    <div class="stage-detail">50 golden metrics, hourly + daily</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="arrow">↓</div>
+
+                        <div class="flow-section">
+                            <div class="flow-title" style="font-size: 1.1em;">🗄️ Archive</div>
+                            <div class="stages">
+                                <div class="stage-box storage">
+                                    <div class="stage-icon">📦</div>
+                                    <div class="stage-name">S3 + Glacier</div>
+                                    <div class="stage-detail">90d+ archive, 10:1 compression</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="arrow">↓</div>
+
+                        <div class="flow-section">
+                            <div class="flow-title" style="font-size: 1.1em;">📊 BI Tools</div>
+                            <div class="stages">
+                                <div class="stage-box" style="border-left: 5px solid #4caf50;">
+                                    <div class="stage-icon">📊</div>
+                                    <div class="stage-name">Tableau / Looker</div>
+                                    <div class="stage-detail">&lt;500ms analytical queries</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow" style="margin-top: 30px;">⬇️⬇️⬇️ MONITORING ACROSS ALL PATHS ⬇️⬇️⬇️</div>
+
+                <!-- MONITORING LAYER -->
+                <div class="flow-section">
+                    <div class="flow-title">🔍 Monitoring, Alerting & Operations</div>
+                    <div class="stages">
+                        <div class="stage-box monitor">
+                            <div class="stage-icon">📈</div>
+                            <div class="stage-name">Prometheus</div>
+                            <div class="stage-detail">Metrics collection, 15s scrape</div>
+                        </div>
+                        <div class="stage-box monitor">
+                            <div class="stage-icon">📊</div>
+                            <div class="stage-name">Grafana</div>
+                            <div class="stage-detail">System dashboards</div>
+                        </div>
+                        <div class="stage-box monitor">
+                            <div class="stage-icon">🚨</div>
+                            <div class="stage-name">PagerDuty</div>
+                            <div class="stage-detail">Incident alerting</div>
+                        </div>
+                        <div class="stage-box monitor">
+                            <div class="stage-icon">📝</div>
+                            <div class="stage-name">ELK Stack</div>
+                            <div class="stage-detail">Log aggregation</div>
+                        </div>
+                        <div class="stage-box monitor">
+                            <div class="stage-icon">✓</div>
+                            <div class="stage-name">Great Expectations</div>
+                            <div class="stage-detail">Data quality checks</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KEY METRICS -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-number">100K</div>
+                    <div class="metric-label">Events per Minute</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">&lt;100ms</div>
+                    <div class="metric-label">Real-time Query SLA (p99)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">&lt;500ms</div>
+                    <div class="metric-label">Analytical Query SLA (p99)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">&lt;5ms</div>
+                    <div class="metric-label">Redis Read Latency</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">1000+</div>
+                    <div class="metric-label">Metrics Supported</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">100</div>
+                    <div class="metric-label">Concurrent Users</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">70%</div>
+                    <div class="metric-label">Cache Hit Rate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">2</div>
+                    <div class="metric-label">Years Data Retention</div>
+                </div>
+            </div>
+
+            <!-- COST BREAKDOWN -->
+            <div class="cost-section">
+                <h3>💰 Monthly Cost Breakdown</h3>
+                <div class="cost-grid">
+                    <div class="cost-item">
+                        <div class="cost-amount">$3K</div>
+                        <div class="cost-name">Kafka<br/>(Ingestion)</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="cost-amount">$8K</div>
+                        <div class="cost-name">Flink<br/>(Real-time)</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="cost-amount">$5K</div>
+                        <div class="cost-name">Redis<br/>(Hot Storage)</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="cost-amount">$6K</div>
+                        <div class="cost-name">Snowflake<br/>(Cold Storage)</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="cost-amount">$2-3K</div>
+                        <div class="cost-name">Kubernetes<br/>(Orchestration)</div>
+                    </div>
+                    <div class="cost-item">
+                        <div class="cost-amount">$1K</div>
+                        <div class="cost-name">Other<br/>(Monitoring, Ops)</div>
+                    </div>
+                    <div class="cost-total">
+                        📊 TOTAL: ~$26,000/month for 1000 metrics<br/>
+                        Unit Cost: $26/metric/month (scales to $7/metric at 5000 metrics)
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCALING TIMELINE -->
+            <div class="scaling-section">
+                <h3>📈 Scaling Roadmap</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-time">NOW: 1K Metrics</div>
+                        <div class="timeline-metrics">
+                            • 350GB Redis<br/>
+                            • 8-12 Flink tasks<br/>
+                            • 100 concurrent users
+                        </div>
+                        <div class="timeline-cost">$26K/month</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">12 Months: 5K Metrics</div>
+                        <div class="timeline-metrics">
+                            • 80% → Snowflake<br/>
+                            • 200 golden in Redis<br/>
+                            • 20-30 Flink tasks
+                        </div>
+                        <div class="timeline-cost">$35K/month</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">24 Months: 10K Metrics</div>
+                        <div class="timeline-metrics">
+                            • Federated Snowflake<br/>
+                            • Batch-only for non-critical<br/>
+                            • Multi-region deployment
+                        </div>
+                        <div class="timeline-cost">$50K/month</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KEY FEATURES -->
+            <div style="margin: 40px 0;">
+                <h2 style="text-align: center; color: #667eea; margin-bottom: 30px;">🎯 Key Architecture Principles</h2>
+                <div class="features-section">
+                    <div class="feature-box">
+                        <div class="feature-icon">🚀⚡</div>
+                        <div class="feature-title">Dual Path Design</div>
+                        <div class="feature-desc">Real-time path for dashboards, batch path for correctness. Never compromise latency or accuracy.</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">🎯📊</div>
+                        <div class="feature-title">Separation of Concerns</div>
+                        <div class="feature-desc">Each tool does ONE thing well. Kafka for streaming, Flink for low-latency, Spark for batch, Snowflake for analytics.</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">💾💨</div>
+                        <div class="feature-title">Multi-Layer Caching</div>
+                        <div class="feature-desc">Memcached + Redis + dbt materialized views = 70% cache hit rate, 10x query speedup.</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">⚙️🔄</div>
+                        <div class="feature-title">Exactly-Once Semantics</div>
+                        <div class="feature-desc">Spark idempotent writes + Flink checkpointing ensures revenue metrics never double-counted.</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">📈💰</div>
+                        <div class="feature-title">Linear Cost Scaling</div>
+                        <div class="feature-desc">Unit economics improve at scale: $26/metric at 1000 metrics → $7/metric at 5000 metrics.</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">🔍📢</div>
+                        <div class="feature-title">Operational Excellence</div>
+                        <div class="feature-desc">Prometheus → Grafana → PagerDuty pipeline ensures sub-minute MTTR for incidents.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TRADEOFFS -->
+            <div style="background: #fff3e0; border-radius: 12px; padding: 30px; margin: 40px 0;">
+                <h3 style="color: #f57c00; margin-bottom: 20px;">⚖️ Key Tradeoffs</h3>
+                <div class="features-section">
+                    <div class="feature-box" style="border: 2px solid #ffc107;">
+                        <strong style="color: #f57c00;">Dual Storage</strong><br/>
+                        ✓ &lt;100ms + 2-year retention<br/>
+                        ✗ Operational complexity
+                    </div>
+                    <div class="feature-box" style="border: 2px solid #ffc107;">
+                        <strong style="color: #f57c00;">Kafka vs Kinesis</strong><br/>
+                        ✓ $7K/month savings<br/>
+                        ✗ Self-managed ops overhead
+                    </div>
+                    <div class="feature-box" style="border: 2px solid #ffc107;">
+                        <strong style="color: #f57c00;">Dual Compute</strong><br/>
+                        ✓ Optimize latency + correctness<br/>
+                        ✗ Dual codebases
+                    </div>
+                    <div class="feature-box" style="border: 2px solid #ffc107;">
+                        <strong style="color: #f57c00;">Eventual Consistency</strong><br/>
+                        ✓ Buy latency<br/>
+                        ✗ 5-minute lag between paths
+                    </div>
+                    <div class="feature-box" style="border: 2px solid #ffc107;">
+                        <strong style="color: #f57c00;">Materialized Views</strong><br/>
+                        ✓ 10x query speedup<br/>
+                        ✗ Forecast which metrics matter
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <footer>
+            <p><strong>Metrics Platform - Complete System Design Infographic</strong></p>
+            <p>For L5 System Design Interviews | 1000+ Metrics | 100 Concurrent Users</p>
+            <p style="margin-top: 15px; color: #999;">Last Updated: June 2026 | © Interview Preparation Material</p>
+        </footer>
+    </div>
+</body>
+</html>

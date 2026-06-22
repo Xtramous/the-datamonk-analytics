@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L5 Data Engineer - 12 Week Intensive Program</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .phase {
+            background-color: #f9f9f9;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .phase h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .phase-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .phase-meta span {
+            background-color: #e8eaf6;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .week {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .week-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .week-number {
+            background-color: #667eea;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .week-title {
+            flex: 1;
+        }
+
+        .week-title h3 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .week-subtitle {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .content-section {
+            margin: 15px 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0 10px 0;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .section-icon {
+            font-size: 18px;
+        }
+
+        .content-list {
+            list-style: none;
+            margin-left: 20px;
+        }
+
+        .content-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .content-list li:last-child {
+            border-bottom: none;
+        }
+
+        .content-list li:before {
+            content: "▸ ";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .time-allocation {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .time-block {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            border-left: 3px solid #667eea;
+        }
+
+        .time-block-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .time-block-hours {
+            color: #667eea;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .validation {
+            background-color: #f3e5f5;
+            border: 1px solid #ce93d8;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        .validation h4 {
+            color: #7b1fa2;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .validation ol {
+            margin-left: 20px;
+            font-size: 13px;
+        }
+
+        .validation li {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .project-milestone {
+            background-color: #e8f5e9;
+            border: 1px solid #81c784;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        .project-milestone h4 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .project-milestone p {
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 8px 0;
+        }
+
+        .resources {
+            background-color: #e3f2fd;
+            border: 1px solid #64b5f6;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        .resources h4 {
+            color: #1565c0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .resources ul {
+            margin-left: 20px;
+            font-size: 13px;
+        }
+
+        .resources li {
+            margin: 5px 0;
+        }
+
+        .resources a {
+            color: #1565c0;
+            text-decoration: none;
+        }
+
+        .resources a:hover {
+            text-decoration: underline;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 13px;
+        }
+
+        .summary-table th {
+            background-color: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .summary-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .summary-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .success-criteria {
+            background-color: #fff3e0;
+            border: 1px solid #ffb74d;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 30px;
+        }
+
+        .success-criteria h3 {
+            color: #e65100;
+            margin-bottom: 10px;
+        }
+
+        .success-criteria ul {
+            margin-left: 20px;
+            font-size: 13px;
+        }
+
+        .success-criteria li {
+            margin: 8px 0;
+        }
+
+        .notes {
+            background-color: #fce4ec;
+            border: 1px solid #f48fb1;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 30px;
+        }
+
+        .notes h3 {
+            color: #c2185b;
+            margin-bottom: 10px;
+        }
+
+        .notes p {
+            font-size: 13px;
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        footer {
+            background-color: #f9f9f9;
+            border-top: 1px solid #e0e0e0;
+            padding: 20px;
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .badge-critical {
+            background-color: #ffcdd2;
+            color: #c62828;
+        }
+
+        .badge-high {
+            background-color: #ffe0b2;
+            color: #e65100;
+        }
+
+        .badge-medium {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+            }
+            .container {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 L5 Data Engineer - 12 Week Intensive Program</h1>
+            <p>Combined Theory + Hands-On Practice for Staff-Level Expertise</p>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Weeks</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">50</div>
+                    <div class="stat-label">Hours/Week</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">600</div>
+                    <div class="stat-label">Total Hours</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Phases</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- PHASE 1 -->
+        <div class="phase">
+            <h2>📊 PHASE 1: SPARK MASTERY + LAKEHOUSE FOUNDATION (Weeks 1-4)</h2>
+            <div class="phase-meta">
+                <span>🎯 Focus: Spark Internals + Practical ETL</span>
+                <span>⏱️ 200 Hours Total</span>
+                <span>🛠️ Tools: Spark, Delta Lake, dbt, S3</span>
+            </div>
+
+            <!-- Week 1 -->
+            <div class="week">
+                <div class="week-header">
+                    <div class="week-number">1</div>
+                    <div class="week-title">
+                        <h3><span class="badge badge-critical">CRITICAL</span>Spark Execution Model & DAG Generation</h3>
+                        <div class="week-subtitle">Understanding how Spark executes queries at the lowest level</div>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">📚</span>
+                        <span>Theory Topics</span>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Spark Architecture:</strong> Driver, Executor, Task, Partition concepts</li>
+                        <li><strong>RDD Lineage & DAG:</strong> How Spark builds directed acyclic graphs</li>
+                        <li><strong>Transformations vs Actions:</strong> Lazy evaluation fundamentals</li>
+                        <li><strong>Job, Stage, Task breakdown:</strong> Task scheduling and execution</li>
+                        <li><strong>Shuffle Operations:</strong> When and why data is moved across nodes</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">💻</span>
+                        <span>Practical Tasks</span>
+                    </div>
+                    <ul class="content-list">
+                        <li>Setup Spark with verbose logging (log4j.properties)</li>
+                        <li>Write 5 different Spark jobs and analyze their DAG using Spark UI</li>
+                        <li>Trace execution: Create partition, read logs, understand task assignment</li>
+                        <li>Compare RDD vs DataFrame performance on identical operations</li>
+                    </ul>
+                </div>
+
+                <div class="time-allocation">
+                    <div class="time-block">
+                        <div class="time-block-title">Theory/Reading</div>
+                        <div class="time-block-hours">8 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Hands-On Lab</div>
+                        <div class="time-block-hours">12 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Project Setup</div>
+                        <div class="time-block-hours">8 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Documentation</div>
+                        <div class="time-block-hours">6 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Practice</div>
+                        <div class="time-block-hours">16 hrs</div>
+                    </div>
+                </div>
+
+                <div class="project-milestone">
+                    <h4>🎯 Project Milestone</h4>
+                    <p><strong>Start: Medallion Lakehouse Architecture</strong></p>
+                    <p>Initialize project structure with Bronze/Silver/Gold layers. Write ingestion Spark job to read CSV → S3/Parquet.</p>
+                </div>
+
+                <div class="validation">
+                    <h4>✅ Validation Questions/Tasks</h4>
+                    <ol>
+                        <li><strong>Deep Dive Task:</strong> Run a Spark job, screenshot the DAG UI, and explain each stage's purpose, shuffle operations, and why tasks are distributed that way.</li>
+                        <li><strong>Conceptual Question:</strong> Explain the difference between a Spark Job, Stage, and Task. Why does a shuffle create a new stage? When would you have 1 job with 3 stages?</li>
+                        <li><strong>Performance Task:</strong> Write a DataFrame operation that avoids a shuffle. Explain why your implementation is more efficient than the naive approach.</li>
+                    </ol>
+                </div>
+
+                <div class="resources">
+                    <h4>📖 Resources</h4>
+                    <ul>
+                        <li>Learning Spark 2nd Edition - Ch 1-3</li>
+                        <li>Apache Spark Official Docs - Architecture & Internals</li>
+                        <li>YouTube: Spark Architecture Deep Dive (Databricks Academy)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Week 2 -->
+            <div class="week">
+                <div class="week-header">
+                    <div class="week-number">2</div>
+                    <div class="week-title">
+                        <h3><span class="badge badge-critical">CRITICAL</span>Catalyst Optimizer & Query Planning</h3>
+                        <div class="week-subtitle">How Spark optimizes your SQL queries automatically</div>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">📚</span>
+                        <span>Theory Topics</span>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Catalyst Optimizer Phases:</strong> Parsing → Analysis → Optimization → Physical Planning</li>
+                        <li><strong>Logical vs Physical Plans:</strong> What EXPLAIN shows and why it matters</li>
+                        <li><strong>Join Ordering:</strong> How Spark decides join sequence (CBO - Cost Based Optimizer)</li>
+                        <li><strong>Predicate Pushdown:</strong> Filtering early to reduce data movement</li>
+                        <li><strong>Column Pruning:</strong> Selecting only needed columns</li>
+                        <li><strong>Constant Folding & Expression Simplification:</strong> Compile-time optimizations</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">💻</span>
+                        <span>Practical Tasks</span>
+                    </div>
+                    <ul class="content-list">
+                        <li>Analyze 10 Spark SQL queries using EXPLAIN output</li>
+                        <li>Write bad query → identify bottleneck in physical plan → rewrite for efficiency</li>
+                        <li>Test join order impact on performance (3+ joins)</li>
+                        <li>Enable/disable statistics collection (ANALYZE TABLE) and compare execution plans</li>
+                    </ul>
+                </div>
+
+                <div class="time-allocation">
+                    <div class="time-block">
+                        <div class="time-block-title">Theory/Reading</div>
+                        <div class="time-block-hours">8 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">EXPLAIN Analysis</div>
+                        <div class="time-block-hours">14 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Query Tuning</div>
+                        <div class="time-block-hours">12 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Project Work</div>
+                        <div class="time-block-hours">16 hrs</div>
+                    </div>
+                </div>
+
+                <div class="project-milestone">
+                    <h4>🎯 Project Milestone</h4>
+                    <p><strong>Bronze → Silver Transformation:</strong> Write dbt models + Spark SQL to clean and deduplicate raw data. Optimize queries for performance.</p>
+                </div>
+
+                <div class="validation">
+                    <h4>✅ Validation Questions/Tasks</h4>
+                    <ol>
+                        <li><strong>EXPLAIN Analysis Task:</strong> Provide a complex 5-table join SQL query. Student must explain the physical plan, identify if join order is optimal, and suggest rewrites if needed.</li>
+                        <li><strong>Optimization Challenge:</strong> Given a slow query, optimize using: predicate pushdown, column pruning, or join reordering. Show before/after EXPLAIN and performance metrics.</li>
+                        <li><strong>Conceptual Question:</strong> When does Catalyst fail to optimize? When would you manually hint join order? Why is CBO sometimes wrong?</li>
+                    </ol>
+                </div>
+
+                <div class="resources">
+                    <h4>📖 Resources</h4>
+                    <ul>
+                        <li>Learning Spark - Ch 4 (Catalyst Optimizer)</li>
+                        <li>Databricks Blog: Query Optimization in Spark SQL</li>
+                        <li>YouTube: Catalyst Deep Dive (Spark Summit talks)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Week 3 -->
+            <div class="week">
+                <div class="week-header">
+                    <div class="week-number">3</div>
+                    <div class="week-title">
+                        <h3><span class="badge badge-critical">CRITICAL</span>Tungsten, Memory Management & Performance Tuning</h3>
+                        <div class="week-subtitle">Optimizing Spark's execution engine at the binary level</div>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">📚</span>
+                        <span>Theory Topics</span>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Tungsten:</strong> Binary memory layout and CPU-friendly execution</li>
+                        <li><strong>Memory Management:</strong> Heap vs Off-heap, reserved vs execution memory</li>
+                        <li><strong>Spilling:</strong> When data exceeds memory; performance implications</li>
+                        <li><strong>Garbage Collection:</strong> GC pauses; tuning for large datasets</li>
+                        <li><strong>Buffer Compression:</strong> Codec selection; trade-off between CPU/network</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">💻</span>
+                        <span>Practical Tasks</span>
+                    </div>
+                    <ul class="content-list">
+                        <li>Profile memory usage: Run job with monitoring; identify spill points</li>
+                        <li>Tune Spark configurations: executor-memory, executor-cores, partitions</li>
+                        <li>Cause & fix a GC bottleneck in a large join operation</li>
+                        <li>Experiment with compression codecs and measure impact on performance</li>
+                    </ul>
+                </div>
+
+                <div class="time-allocation">
+                    <div class="time-block">
+                        <div class="time-block-title">Theory/Reading</div>
+                        <div class="time-block-hours">8 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Profiling Lab</div>
+                        <div class="time-block-hours">12 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Tuning Practice</div>
+                        <div class="time-block-hours">14 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Project Work</div>
+                        <div class="time-block-hours">16 hrs</div>
+                    </div>
+                </div>
+
+                <div class="project-milestone">
+                    <h4>🎯 Project Milestone</h4>
+                    <p><strong>Performance Baseline:</strong> Run lakehouse jobs with monitoring. Document baseline metrics: execution time, memory usage, shuffle size. Optimize for 20%+ improvement.</p>
+                </div>
+
+                <div class="validation">
+                    <h4>✅ Validation Questions/Tasks</h4>
+                    <ol>
+                        <li><strong>Troubleshooting Task:</strong> Provide logs showing GC overhead >50%. Student must diagnose root cause and provide 3 tuning recommendations with rationale.</li>
+                        <li><strong>Configuration Challenge:</strong> Given cluster specs (8 nodes, 32GB RAM) and job characteristics (large shuffles), optimize Spark configuration and justify choices.</li>
+                        <li><strong>Conceptual Question:</strong> Explain Tungsten's binary format advantage. When does compression help/hurt? Why is memory spilling a last resort?</li>
+                    </ol>
+                </div>
+
+                <div class="resources">
+                    <h4>📖 Resources</h4>
+                    <ul>
+                        <li>Learning Spark - Ch 5 (Tungsten & Memory)</li>
+                        <li>Databricks: Spark Tuning Guide</li>
+                        <li>Apache Spark Official Docs: Memory Management</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Week 4 -->
+            <div class="week">
+                <div class="week-header">
+                    <div class="week-number">4</div>
+                    <div class="week-title">
+                        <h3><span class="badge badge-critical">CRITICAL</span>Shuffle Internals, Broadcast & Skew Handling</h3>
+                        <div class="week-subtitle">Mastering Spark's data movement and advanced optimization</div>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">📚</span>
+                        <span>Theory Topics</span>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Shuffle Mechanics:</strong> Map → Shuffle → Reduce phases; network cost</li>
+                        <li><strong>Broadcast Joins:</strong> When to use; size limitations; network optimization</li>
+                        <li><strong>Skewed Data Handling:</strong> Detecting skew; repartitioning strategies; salting technique</li>
+                        <li><strong>AQE (Adaptive Query Execution):</strong> Dynamic optimization based on runtime stats</li>
+                        <li><strong>Coalescing & Repartitioning:</strong> Partition count impact on performance</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">💻</span>
+                        <span>Practical Tasks</span>
+                    </div>
+                    <ul class="content-list">
+                        <li>Build dataset with skewed join key; diagnose & fix using salting technique</li>
+                        <li>Implement broadcast join; compare with sort-merge join on metrics</li>
+                        <li>Enable AQE; show how runtime stats change execution plan mid-query</li>
+                        <li>Optimize partition count for various data volumes (100MB, 10GB, 100GB, 1TB)</li>
+                    </ul>
+                </div>
+
+                <div class="time-allocation">
+                    <div class="time-block">
+                        <div class="time-block-title">Theory/Reading</div>
+                        <div class="time-block-hours">8 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Lab Exercises</div>
+                        <div class="time-block-hours">14 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Advanced Practice</div>
+                        <div class="time-block-hours">12 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Project Optimization</div>
+                        <div class="time-block-hours">16 hrs</div>
+                    </div>
+                </div>
+
+                <div class="project-milestone">
+                    <h4>🎯 Project Milestone</h4>
+                    <p><strong>Complete Lakehouse Phase 1:</strong> Full Bronze → Silver → Gold pipeline with optimized joins, partitioning, and materialized views. Document all optimization decisions.</p>
+                </div>
+
+                <div class="validation">
+                    <h4>✅ Validation Questions/Tasks</h4>
+                    <ol>
+                        <li><strong>Skew Detection & Fix Task:</strong> Given a slow join, prove skew exists (histogram), implement salting fix, show performance improvement ≥30%.</li>
+                        <li><strong>Join Strategy Challenge:</strong> Design 3 different join approaches for: small dim table + large fact table. Compare performance, memory, network. Justify chosen approach.</li>
+                        <li><strong>Partition Optimization Task:</strong> Analyze query plans; recommend optimal partition count and scheme. Support with cost calculations.</li>
+                    </ol>
+                </div>
+
+                <div class="resources">
+                    <h4>📖 Resources</h4>
+                    <ul>
+                        <li>Databricks: Spark Shuffle Explained</li>
+                        <li>Spark Summit: AQE in Apache Spark</li>
+                        <li>Blog: Handling Skew in Spark Joins</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- PHASE 2 -->
+        <div class="phase">
+            <h2>⚙️ PHASE 2: DISTRIBUTED SYSTEMS + STREAMING (Weeks 5-8)</h2>
+            <div class="phase-meta">
+                <span>🎯 Focus: Theory + Streaming Implementation</span>
+                <span>⏱️ 200 Hours Total</span>
+                <span>🛠️ Tools: Kafka, Spark Streaming, Delta Lake</span>
+            </div>
+
+            <!-- Week 5 -->
+            <div class="week">
+                <div class="week-header">
+                    <div class="week-number">5</div>
+                    <div class="week-title">
+                        <h3><span class="badge badge-critical">CRITICAL</span>CAP Theorem & Consistency Models</h3>
+                        <div class="week-subtitle">Understanding trade-offs in distributed data systems</div>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">📚</span>
+                        <span>Theory Topics</span>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>CAP Theorem:</strong> Consistency, Availability, Partition tolerance - pick 2</li>
+                        <li><strong>Consistency Models:</strong> Strong, eventual, causal, read-your-writes</li>
+                        <li><strong>Data System Classification:</strong> Kafka (AP), Snowflake (CA), DynamoDB (AP with options)</li>
+                        <li><strong>Replication Lag:</strong> Implications for analytics; eventually consistent patterns</li>
+                        <li><strong>Conflict Resolution:</strong> Last-write-wins vs custom resolution</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">💻</span>
+                        <span>Practical Tasks</span>
+                    </div>
+                    <ul class="content-list">
+                        <li>Classify 10 systems by CAP: Kafka, Snowflake, DynamoDB, Cassandra, MongoDB, etc.</li>
+                        <li>Design: Multi-region lakehouse with eventual consistency; document trade-offs</li>
+                        <li>Write code to detect & handle replication lag in batch processing</li>
+                        <li>Implement read-your-writes consistency pattern in streaming architecture</li>
+                    </ul>
+                </div>
+
+                <div class="time-allocation">
+                    <div class="time-block">
+                        <div class="time-block-title">Theory/Reading</div>
+                        <div class="time-block-hours">10 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">System Analysis</div>
+                        <div class="time-block-hours">12 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Design Exercises</div>
+                        <div class="time-block-hours">14 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Project Integration</div>
+                        <div class="time-block-hours">14 hrs</div>
+                    </div>
+                </div>
+
+                <div class="project-milestone">
+                    <h4>🎯 Project Milestone</h4>
+                    <p><strong>Streaming Foundation:</strong> Design multi-region ingestion strategy. Document consistency guarantees and failure scenarios.</p>
+                </div>
+
+                <div class="validation">
+                    <h4>✅ Validation Questions/Tasks</h4>
+                    <ol>
+                        <li><strong>System Classification Task:</strong> Given 5 unfamiliar systems, classify by CAP and explain reasoning. Provide use case where each is appropriate.</li>
+                        <li><strong>Design Challenge:</strong> Design lakehouse supporting 50+ teams across 3 regions with <1 second replication lag requirement. Justify CAP choices.</li>
+                        <li><strong>Consistency Question:</strong> Explain: What guarantees does Kafka provide? What about Snowflake? How do you bridge the gap in a lakehouse?</li>
+                    </ol>
+                </div>
+
+                <div class="resources">
+                    <h4>📖 Resources</h4>
+                    <ul>
+                        <li>DDIA Ch 7 (Transactions) & Ch 5 (Replication)</li>
+                        <li>CAP Theorem Revisited (Brewer 2012)</li>
+                        <li>MIT 6.824: Distributed Systems (OpenCourseWare)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Week 6 -->
+            <div class="week">
+                <div class="week-header">
+                    <div class="week-number">6</div>
+                    <div class="week-title">
+                        <h3><span class="badge badge-high">HIGH</span>Replication, Consensus & Exactly-Once Semantics</h3>
+                        <div class="week-subtitle">Building reliable distributed data pipelines</div>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">📚</span>
+                        <span>Theory Topics</span>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Replication Strategies:</strong> Single-leader, multi-leader, leaderless; trade-offs</li>
+                        <li><strong>Consensus Algorithms:</strong> Raft, Paxos concepts; applied to data systems</li>
+                        <li><strong>Write-Ahead Logs (WAL):</strong> Durability guarantees; replay for recovery</li>
+                        <li><strong>Idempotency:</strong> Core requirement for exactly-once; deduplication patterns</li>
+                        <li><strong>Exactly-Once Delivery:</strong> 3 approaches (transactional, idempotent+dedup, distributed transactions)</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">💻</span>
+                        <span>Practical Tasks</span>
+                    </div>
+                    <ul class="content-list">
+                        <li>Implement idempotent producer → Kafka → consumer → deduplication pattern</li>
+                        <li>Simulate failure: Kill consumer; resume from offset; verify no data loss/duplication</li>
+                        <li>Compare: at-least-once vs exactly-once; code and document trade-offs</li>
+                        <li>Build WAL + recovery mechanism in simple data pipeline</li>
+                    </ul>
+                </div>
+
+                <div class="time-allocation">
+                    <div class="time-block">
+                        <div class="time-block-title">Theory/Reading</div>
+                        <div class="time-block-hours">10 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Failure Simulation</div>
+                        <div class="time-block-hours">14 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Implementation</div>
+                        <div class="time-block-hours">12 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Project: Streaming Sink</div>
+                        <div class="time-block-hours">14 hrs</div>
+                    </div>
+                </div>
+
+                <div class="project-milestone">
+                    <h4>🎯 Project Milestone</h4>
+                    <p><strong>Fault-Tolerant Streaming:</strong> Build Kafka → Spark Streaming → Delta Lake pipeline with exactly-once semantics. Validate with failure scenarios.</p>
+                </div>
+
+                <div class="validation">
+                    <h4>✅ Validation Questions/Tasks</h4>
+                    <ol>
+                        <li><strong>Failure Resilience Task:</strong> Implement streaming pipeline. Inject 5 failure scenarios (broker down, consumer crash, etc). Verify no data loss/duplication in each case.</li>
+                        <li><strong>Exactly-Once Design Challenge:</strong> Design CDC pipeline requiring exactly-once delivery. Explain idempotency strategy + deduplication key + recovery logic.</li>
+                        <li><strong>Consensus Concept Question:</strong> How does Kafka use consensus? Why doesn't Snowflake need Raft? When would you sacrifice consistency?</li>
+                    </ol>
+                </div>
+
+                <div class="resources">
+                    <h4>📖 Resources</h4>
+                    <ul>
+                        <li>DDIA Ch 5 (Replication) & Ch 9 (Consistency & Consensus)</li>
+                        <li>Kafka Documentation: Durability & Replication</li>
+                        <li>Blog: Exactly-Once Semantics in Distributed Systems</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Week 7 -->
+            <div class="week">
+                <div class="week-header">
+                    <div class="week-number">7</div>
+                    <div class="week-title">
+                        <h3><span class="badge badge-high">HIGH</span>Kafka Internals & Partitioning Strategy</h3>
+                        <div class="week-subtitle">Mastering Kafka as your real-time data backbone</div>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">📚</span>
+                        <span>Theory Topics</span>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Kafka Architecture:</strong> Brokers, In-Sync Replicas (ISR), Leader election</li>
+                        <li><strong>Partitioning:</strong> Key-based routing; impact on ordering, throughput, hot partitions</li>
+                        <li><strong>Consumer Groups:</strong> Rebalancing, offset management, lag tracking</li>
+                        <li><strong>Transactional Reads/Writes:</strong> Exactly-once processing semantics</li>
+                        <li><strong>Retention & Compaction:</strong> Trade-offs; disk usage optimization</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">💻</span>
+                        <span>Practical Tasks</span>
+                    </div>
+                    <ul class="content-list">
+                        <li>Setup multi-broker Kafka cluster locally; simulate broker failure</li>
+                        <li>Design partitioning scheme for 1M events/sec with event types; justify key choice</li>
+                        <li>Implement producer → idempotent + transactions; consumer with offset management</li>
+                        <li>Debug consumer lag; diagnose root cause (throughput, processing, rebalancing)</li>
+                    </ul>
+                </div>
+
+                <div class="time-allocation">
+                    <div class="time-block">
+                        <div class="time-block-title">Theory/Reading</div>
+                        <div class="time-block-hours">8 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Kafka Setup & Ops</div>
+                        <div class="time-block-hours">14 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Design Practice</div>
+                        <div class="time-block-hours">12 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Project Integration</div>
+                        <div class="time-block-hours">16 hrs</div>
+                    </div>
+                </div>
+
+                <div class="project-milestone">
+                    <h4>🎯 Project Milestone</h4>
+                    <p><strong>Real-Time Data Source:</strong> Add Kafka as event source to lakehouse. Implement multi-partition producer + balanced consumer group.</p>
+                </div>
+
+                <div class="validation">
+                    <h4>✅ Validation Questions/Tasks</h4>
+                    <ol>
+                        <li><strong>Partitioning Design Task:</strong> Design Kafka topic for: user events, 50M users, 1K events/sec per user. Justify partition count, key choice, replication factor.</li>
+                        <li><strong>Operational Challenge:</strong> Debug Kafka cluster: consumer lagging, one partition slow. Analyze logs, identify bottleneck (throughput, rebalancing, skew), recommend fix.</li>
+                        <li><strong>Transactional Question:</strong> Explain Kafka transactions. Why is exactly-once still challenging? When do you need it vs at-least-once?</li>
+                    </ol>
+                </div>
+
+                <div class="resources">
+                    <h4>📖 Resources</h4>
+                    <ul>
+                        <li>Kafka: The Definitive Guide (O'Reilly)</li>
+                        <li>Kafka Official Documentation</li>
+                        <li>Blog: Kafka Consumer Lag Explained</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Week 8 -->
+            <div class="week">
+                <div class="week-header">
+                    <div class="week-number">8</div>
+                    <div class="week-title">
+                        <h3><span class="badge badge-high">HIGH</span>Spark Structured Streaming & Real-Time Processing</h3>
+                        <div class="week-subtitle">Building stateful, fault-tolerant streaming applications</div>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">📚</span>
+                        <span>Theory Topics</span>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Micro-Batch vs Continuous Processing:</strong> Trade-offs; latency vs throughput</li>
+                        <li><strong>Stateful Operations:</strong> Stream aggregations, joins; state store management</li>
+                        <li><strong>Windowing Semantics:</strong> Tumbling, sliding, session windows; semantics</li>
+                        <li><strong>Watermarking:</strong> Handling late arrivals; allowed lateness trade-off</li>
+                        <li><strong>Exactly-Once Delivery in Spark:</strong> Checkpoints, idempotent sinks, deduplication</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">💻</span>
+                        <span>Practical Tasks</span>
+                    </div>
+                    <ul class="content-list">
+                        <li>Build streaming aggregation: rolling statistics, percentiles with late data handling</li>
+                        <li>Implement stream-stream join; handle out-of-order events with watermarks</li>
+                        <li>Implement stateful operations: running count, session detection, anomaly flagging</li>
+                        <li>Enable checkpointing; simulate failure; verify recovery without data loss</li>
+                    </ul>
+                </div>
+
+                <div class="time-allocation">
+                    <div class="time-block">
+                        <div class="time-block-title">Theory/Reading</div>
+                        <div class="time-block-hours">8 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Streaming Dev</div>
+                        <div class="time-block-hours">14 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">State Management</div>
+                        <div class="time-block-hours">12 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Project: Full Pipeline</div>
+                        <div class="time-block-hours">16 hrs</div>
+                    </div>
+                </div>
+
+                <div class="project-milestone">
+                    <h4>🎯 Project Milestone</h4>
+                    <p><strong>Complete Streaming Pipeline:</strong> Kafka → Spark Structured Streaming → Delta Lake with windowing, watermarks, and exactly-once delivery. Full Phase 2 completion.</p>
+                </div>
+
+                <div class="validation">
+                    <h4>✅ Validation Questions/Tasks</h4>
+                    <ol>
+                        <li><strong>Stateful Processing Task:</strong> Build streaming pipeline: detecting sessions (user inactive >5 min = new session). Handle late arrivals correctly with watermarking.</li>
+                        <li><strong>Stream Join Challenge:</strong> Join fast-moving stream A with slow stream B. Design for: low latency, handle B updates, exactly-once semantics. Show state size considerations.</li>
+                        <li><strong>Failure Recovery Question:</strong> Explain checkpoint mechanism. Why is idempotent sink required? Design recovery after 10-minute outage.</li>
+                    </ol>
+                </div>
+
+                <div class="resources">
+                    <h4>📖 Resources</h4>
+                    <ul>
+                        <li>Learning Spark - Ch 8 (Structured Streaming)</li>
+                        <li>Databricks: Structured Streaming Programming Guide</li>
+                        <li>Blog: Watermarking in Structured Streaming</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- PHASE 3 -->
+        <div class="phase">
+            <h2>🏗️ PHASE 3: SYSTEM DESIGN + PRODUCTION OPERATIONS (Weeks 9-12)</h2>
+            <div class="phase-meta">
+                <span>🎯 Focus: Architecture + Reliability Engineering</span>
+                <span>⏱️ 200 Hours Total</span>
+                <span>🛠️ Topics: Design patterns, SLA/SLO, Cost optimization, Monitoring</span>
+            </div>
+
+            <!-- Week 9 -->
+            <div class="week">
+                <div class="week-header">
+                    <div class="week-number">9</div>
+                    <div class="week-title">
+                        <h3><span class="badge badge-critical">CRITICAL</span>Data System Design Framework & Real-Time Analytics Platform</h3>
+                        <div class="week-subtitle">Designing systems that scale to millions of events per second</div>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">📚</span>
+                        <span>Theory Topics</span>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Design Framework:</strong> Requirements → Capacity planning → Component design → Trade-offs → Failure scenarios</li>
+                        <li><strong>Real-Time Analytics Platform:</strong> Ingestion, storage, query, serving layers</li>
+                        <li><strong>Scalability Patterns:</strong> Sharding, caching, batching, denormalization</li>
+                        <li><strong>Hot Partition Problem:</strong> Detection, salting, bucketing, load balancing</li>
+                        <li><strong>Query Latency Optimization:</strong> Pre-aggregation, materialization, caching</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">💻</span>
+                        <span>Practical Tasks</span>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Design 1:</strong> Real-time analytics platform: 1M events/sec, sub-5 second query latency, 30-day retention</li>
+                        <li>Capacity planning: Kafka partition count, Spark executor config, Snowflake warehouse size</li>
+                        <li>Diagram: Data flow, component interactions, failure points</li>
+                        <li>Document: Trade-offs, cost estimate, SLA/SLO definition</li>
+                    </ul>
+                </div>
+
+                <div class="time-allocation">
+                    <div class="time-block">
+                        <div class="time-block-title">Framework Learning</div>
+                        <div class="time-block-hours">8 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Design Exercise</div>
+                        <div class="time-block-hours">16 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Capacity Planning</div>
+                        <div class="time-block-hours">12 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Documentation</div>
+                        <div class="time-block-hours">14 hrs</div>
+                    </div>
+                </div>
+
+                <div class="project-milestone">
+                    <h4>🎯 Project Milestone</h4>
+                    <p><strong>Multi-Stream Analytics:</strong> Extend lakehouse to support 3 data sources with different SLAs. Document architecture with failure scenarios.</p>
+                </div>
+
+                <div class="validation">
+                    <h4>✅ Validation Questions/Tasks</h4>
+                    <ol>
+                        <li><strong>System Design Challenge:</strong> Real-time dashboard for 50M users. 100 concurrent users, <500ms query latency. Design system. Calculate partition count, cache strategy, pre-aggregation needs.</li>
+                        <li><strong>Capacity Planning Task:</strong> Given: 5M events/day, 80th percentile event size 1KB. Design Kafka (partitions, retention, replication), storage (S3 partitioning), compute (cluster size).</li>
+                        <li><strong>Trade-off Question:</strong> You have $10K/month budget. Design real-time platform: optimize for latency vs cost. Show 3 different approaches with pros/cons.</li>
+                    </ol>
+                </div>
+
+                <div class="resources">
+                    <h4>📖 Resources</h4>
+                    <ul>
+                        <li>DDIA Ch 1-3 (Design principles)</li>
+                        <li>Designing Data-Intensive Applications for interviews</li>
+                        <li>Grokking System Design Interviews (Educative)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Week 10 -->
+            <div class="week">
+                <div class="week-header">
+                    <div class="week-number">10</div>
+                    <div class="week-title">
+                        <h3><span class="badge badge-critical">CRITICAL</span>CDC Architecture, Data Vault & Advanced Data Modeling</h3>
+                        <div class="week-subtitle">Designing scalable, maintainable data architectures</div>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">📚</span>
+                        <span>Theory Topics</span>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Change Data Capture (CDC):</strong> Patterns (log-based, query-based, trigger-based); tools (Debezium, Fivetran)</li>
+                        <li><strong>Data Modeling Approaches:</strong> Kimball (star schema), Data Vault 2.0, Event modeling, Medallion</li>
+                        <li><strong>Slowly Changing Dimensions (SCD):</strong> Type 1-5; which to use; trade-offs</li>
+                        <li><strong>Fact Table Design:</strong> Granularity, fact types (transactional, periodic, accumulating)</li>
+                        <li><strong>Lakehouse Modeling:</strong> Combining warehouse + data lake; Bronze/Silver/Gold rationale</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">💻</span>
+                        <span>Practical Tasks</span>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Design 2:</strong> CDC pipeline: Oracle DB → Kafka → Delta Lake → Snowflake. Handle 50K inserts/updates per day</li>
+                        <li>Compare data modeling approaches (Kimball vs Data Vault vs Event) for same requirements</li>
+                        <li>Implement SCD Type 2 in dbt; document surrogate key strategy, effective dating</li>
+                        <li>Design fact table schema for e-commerce: orders, returns, refunds; grain, dimensions, measures</li>
+                    </ul>
+                </div>
+
+                <div class="time-allocation">
+                    <div class="time-block">
+                        <div class="time-block-title">Theory/Reading</div>
+                        <div class="time-block-hours">10 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">CDC Design</div>
+                        <div class="time-block-hours">12 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Data Modeling</div>
+                        <div class="time-block-hours">14 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Implementation</div>
+                        <div class="time-block-hours">14 hrs</div>
+                    </div>
+                </div>
+
+                <div class="project-milestone">
+                    <h4>🎯 Project Milestone</h4>
+                    <p><strong>CDC + Data Vault:</strong> Build CDC pipeline from source system. Implement SCD Type 2 + Data Vault modeling for dimensional data.</p>
+                </div>
+
+                <div class="validation">
+                    <h4>✅ Validation Questions/Tasks</h4>
+                    <ol>
+                        <li><strong>CDC Architecture Task:</strong> Design CDC for: customer master (1K updates/day), orders (100K/day), items (10M/day). Justify CDC method + Kafka partitioning + deduplication strategy.</li>
+                        <li><strong>Modeling Comparison:</strong> Model sales data using Kimball, Data Vault, and Event modeling. Compare: query complexity, grain flexibility, SCD handling. Recommend for data lake scenario.</li>
+                        <li><strong>Fact Table Design Question:</strong> Design fact table for: subscription platform with upgrades, downgrades, refunds. Multiple currencies. Show grain, dimensions, measures, handling of SCD.</li>
+                    </ol>
+                </div>
+
+                <div class="resources">
+                    <h4>📖 Resources</h4>
+                    <ul>
+                        <li>The Data Warehouse Toolkit (Kimball & Ross)</li>
+                        <li>Building a Scalable Data Warehouse (Data Vault 2.0)</li>
+                        <li>Debezium CDC Documentation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Week 11 -->
+            <div class="week">
+                <div class="week-header">
+                    <div class="week-number">11</div>
+                    <div class="week-title">
+                        <h3><span class="badge badge-high">HIGH</span>SLA/SLO, Data Reliability & Incident Management</h3>
+                        <div class="week-subtitle">Operating data systems in production with confidence</div>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">📚</span>
+                        <span>Theory Topics</span>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>SLA vs SLO vs SLI:</strong> Definitions, relationship; error budgets</li>
+                        <li><strong>Data Reliability Engineering:</strong> Freshness, completeness, timeliness SLOs</li>
+                        <li><strong>Backfill & Replay Strategies:</strong> Handling data gaps; cost optimization; integrity checks</li>
+                        <li><strong>Schema Evolution:</strong> Handling breaking changes; versioning strategies</li>
+                        <li><strong>Data Lineage & Observability:</strong> Tracking dependencies; root cause analysis</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">💻</span>
+                        <span>Practical Tasks</span>
+                    </div>
+                    <ul class="content-list">
+                        <li>Define SLOs for lakehouse: data freshness <4 hours, completeness >99.5%, latency <15 min</li>
+                        <li>Design backfill strategy for 1-week data outage; estimate time + cost</li>
+                        <li>Implement schema change (add required column to billions of rows); zero downtime</li>
+                        <li>Build incident dashboard: tracking failures, MTTR, impact, root cause analysis</li>
+                    </ul>
+                </div>
+
+                <div class="time-allocation">
+                    <div class="time-block">
+                        <div class="time-block-title">Theory/Reading</div>
+                        <div class="time-block-hours">8 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">SLO Definition</div>
+                        <div class="time-block-hours">12 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Reliability Design</div>
+                        <div class="time-block-hours">14 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Tooling & Implementation</div>
+                        <div class="time-block-hours">16 hrs</div>
+                    </div>
+                </div>
+
+                <div class="project-milestone">
+                    <h4>🎯 Project Milestone</h4>
+                    <p><strong>Production-Ready Lakehouse:</strong> Define comprehensive SLOs. Build monitoring + alerting. Document runbooks for common failures.</p>
+                </div>
+
+                <div class="validation">
+                    <h4>✅ Validation Questions/Tasks</h4>
+                    <ol>
+                        <li><strong>SLO Design Challenge:</strong> You have 0.5% error budget/month (4.38 hours downtime). Design SLOs for 3 tiers of data: critical, standard, development. Justify allocations.</li>
+                        <li><strong>Reliability Task:</strong> Simulate data quality incident: 10% of records missing 1 column. Design: detection (how fast?), impact analysis, backfill strategy, prevention.</li>
+                        <li><strong>Schema Evolution Question:</strong> Schema change: add NOT NULL column to 10B row table. Design zero-downtime migration. Document rollback plan if needed.</li>
+                    </ol>
+                </div>
+
+                <div class="resources">
+                    <h4>📖 Resources</h4>
+                    <ul>
+                        <li>Site Reliability Engineering (Google SRE Book)</li>
+                        <li>Fundamentals of Data Engineering - Ch 13 (Resilience)</li>
+                        <li>Blog: Data Quality at Scale</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Week 12 -->
+            <div class="week">
+                <div class="week-header">
+                    <div class="week-number">12</div>
+                    <div class="week-title">
+                        <h3><span class="badge badge-high">HIGH</span>Cost Optimization & Final System Design Challenges</h3>
+                        <div class="week-subtitle">Operating efficient, cost-effective data platforms</div>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">📚</span>
+                        <span>Theory Topics</span>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Cloud Cost Optimization:</strong> Spot instances, reserved capacity, on-demand trade-offs</li>
+                        <li><strong>Snowflake Tuning:</strong> Warehouse sizing, clustering, query optimizer, caching</li>
+                        <li><strong>S3 Optimization:</strong> Lifecycle policies, partitioning, file format selection (Parquet vs ORC)</li>
+                        <li><strong>Spark Optimization Recap:</strong> Executor config, shuffle optimization, broadcast strategy</li>
+                        <li><strong>Cost vs Performance Trade-offs:</strong> When to optimize, when to accept overhead</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <span class="section-icon">💻</span>
+                        <span>Practical Tasks</span>
+                    </div>
+                    <ul class="content-list">
+                        <li><strong>Design 3-5:</strong> 5 system designs (see below); spend 3-4 hours each</li>
+                        <li>Cost analysis: Current lakehouse spend vs optimized design; identify 30%+ savings</li>
+                        <li>Snowflake optimization: Analyze query costs; identify clustering, result caching wins</li>
+                        <li>S3 lifecycle policy: Design tiering strategy for multi-year retention at minimal cost</li>
+                    </ul>
+                </div>
+
+                <div class="time-allocation">
+                    <div class="time-block">
+                        <div class="time-block-title">Theory/Reading</div>
+                        <div class="time-block-hours">6 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Design Exercise 1</div>
+                        <div class="time-block-hours">12 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Design Exercise 2</div>
+                        <div class="time-block-hours">12 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Cost Optimization</div>
+                        <div class="time-block-hours">12 hrs</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-block-title">Final Prep</div>
+                        <div class="time-block-hours">8 hrs</div>
+                    </div>
+                </div>
+
+                <div class="project-milestone">
+                    <h4>🎯 Project Milestone</h4>
+                    <p><strong>Complete Production System:</strong> Finalize lakehouse with: cost tracking, optimization recommendations, monitoring, documentation. Ready for interview scenarios.</p>
+                </div>
+
+                <div class="validation">
+                    <h4>✅ Validation Questions/Tasks</h4>
+                    <ol>
+                        <li><strong>System Designs (5 total):</strong>
+                            <ol style="list-style-type: lower-alpha;">
+                                <li><strong>Feature Pipeline:</strong> ML training data: low latency, point-in-time correctness, state handling</li>
+                                <li><strong>Metrics Platform:</strong> 1000+ metrics, 100 concurrent users, sub-second queries, real-time + historical</li>
+                                <li><strong>Data Mesh:</strong> 50+ teams, data products as first-class citizens, discovery, governance</li>
+                                <li><strong>Anomaly Detection:</strong> Real-time alerting on KPI deviations; 99.9% precision; minimal false positives</li>
+                                <li><strong>Multi-Tenant Analytics:</strong> 100 customers, separate billing, noisy neighbor problem isolation</li>
+                            </ol>
+                        </li>
+                        <li><strong>Cost Optimization Task:</strong> Current: $50K/month on Snowflake + $20K Spark compute. Identify 3 optimization opportunities. Show projected savings + trade-offs.</li>
+                        <li><strong>Interview Readiness Review:</strong> Answer 10 L5 interview questions covering: system design, distributed systems, Spark internals, reliability, cost optimization.</li>
+                    </ol>
+                </div>
+
+                <div class="resources">
+                    <h4>📖 Resources</h4>
+                    <ul>
+                        <li>Cloud Cost Optimization: AWS, GCP, Azure docs</li>
+                        <li>Snowflake University: Optimizing Queries</li>
+                        <li>AWS: S3 Best Practices & Storage Classes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROGRAM SUMMARY -->
+        <div style="margin-top: 40px; padding: 20px; background-color: #f9f9f9; border-radius: 4px;">
+            <h2 style="margin-bottom: 20px; color: #333;">📋 12-Week Program Summary</h2>
+
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>Weeks</th>
+                        <th>Focus Area</th>
+                        <th>Key Skills</th>
+                        <th>Hours</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Phase 1</strong></td>
+                        <td>1-4</td>
+                        <td>Spark Mastery + Lakehouse</td>
+                        <td>DAG, Catalyst, Tungsten, Shuffle, Broadcast, Skew</td>
+                        <td>200</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phase 2</strong></td>
+                        <td>5-8</td>
+                        <td>Distributed Systems + Streaming</td>
+                        <td>CAP, Replication, Consensus, Exactly-Once, Kafka, Stream Processing</td>
+                        <td>200</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phase 3</strong></td>
+                        <td>9-12</td>
+                        <td>System Design + Operations</td>
+                        <td>5 System Designs, SLO/SLA, Reliability, Cost Optimization</td>
+                        <td>200</td>
+                    </tr>
+                    <tr style="font-weight: bold; background-color: #f0f0f0;">
+                        <td colspan="4">TOTAL</td>
+                        <td>600 hours</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 style="margin-top: 30px; margin-bottom: 15px; color: #333;">Key Projects Completed:</h3>
+            <ul style="margin-left: 20px; font-size: 13px;">
+                <li>✅ <strong>Week 1-4:</strong> Bronze/Silver/Gold medallion lakehouse with optimized Spark queries</li>
+                <li>✅ <strong>Week 5-8:</strong> Fault-tolerant Kafka → Spark Streaming → Delta Lake pipeline</li>
+                <li>✅ <strong>Week 9:</strong> Real-time analytics platform design (1M events/sec)</li>
+                <li>✅ <strong>Week 10:</strong> CDC pipeline with Data Vault modeling</li>
+                <li>✅ <strong>Week 11:</strong> Production-ready system with SLOs, monitoring, runbooks</li>
+                <li>✅ <strong>Week 12:</strong> 5 complete system designs + cost optimization analysis</li>
+            </ul>
+        </div>
+
+        <!-- SUCCESS CRITERIA -->
+        <div class="success-criteria">
+            <h3>✅ Success Criteria: Interview-Ready L5 Data Engineer</h3>
+            <ul>
+                <li><strong>Spark:</strong> Can explain any EXPLAIN output; identify bottlenecks without profiling; know memory/shuffle trade-offs cold</li>
+                <li><strong>Distributed Systems:</strong> Understand CAP implications; explain consistency models; design for failure scenarios</li>
+                <li><strong>System Design:</strong> Can design 5+ major systems: real-time analytics, CDC, feature pipeline, metrics platform, data mesh</li>
+                <li><strong>Streaming:</strong> Build exactly-once Kafka → Spark → DW pipelines; handle late data, out-of-order, state management</li>
+                <li><strong>Reliability:</strong> Define SLOs; estimate MTBF/MTTR; design backfill strategies; root cause analysis</li>
+                <li><strong>Cost Optimization:</strong> Identify 30%+ savings opportunities; balance reliability vs cost</li>
+                <li><strong>Data Architecture:</strong> Compare Kimball/Data Vault/Event modeling; design SCD; handle schema evolution</li>
+                <li><strong>Leadership:</strong> Document design decisions; communicate trade-offs; mentor junior engineers (via your documentation)</li>
+            </ul>
+        </div>
+
+        <!-- NOTES -->
+        <div class="notes">
+            <h3>⚠️ Important Notes</h3>
+            <p><strong>1. Parallel Learning:</strong> Theory and practical are intentionally interleaved. You'll learn Spark internals (theory) while optimizing queries (practical) in the same week. This dual approach accelerates understanding.</p>
+            <p><strong>2. 50 Hours/Week:</strong> This is intense. Assumes full-time (40 hours) + supplemental learning (10 hours). Doable if you're between jobs or can dedicate weekends.</p>
+            <p><strong>3. Hands-On Project:</strong> The lakehouse project threads through all 12 weeks. By Week 12, you'll have: batch + stream ingestion, dbt transformations, data quality, monitoring, cost tracking. Use it heavily in interviews.</p>
+            <p><strong>4. Interview Readiness:</strong> By Week 12, you should be able to: discuss your lakehouse design decisions, explain distributed systems trade-offs, design 5+ systems from scratch, troubleshoot production scenarios.</p>
+            <p><strong>5. Flexibility:</strong> If you're stronger in some areas (e.g., SQL from 11 years experience), reallocate those hours to weaker areas (e.g., system design). Minimum viable: 4-6 months @ 50 hrs/week for L5 readiness.</p>
+        </div>
+
+        <footer>
+            <p>📊 L5 Data Engineer - 12 Week Intensive Program | 600 Total Hours | 50 Hours/Week | Designed for Staff-Level Expertise</p>
+            <p>⚠️ Share this program only with serious commitments. 50 hours/week requires full dedication.</p>
+        </footer>
+    </div>
+</body>
+</html>

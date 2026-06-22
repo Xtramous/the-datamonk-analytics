@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 2: Spark Core Concepts & RDD Architecture - Complete Study Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .table-of-contents {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+
+        .table-of-contents h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .table-of-contents ol {
+            margin-left: 20px;
+        }
+
+        .table-of-contents li {
+            margin: 8px 0;
+        }
+
+        .table-of-contents a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .table-of-contents a:hover {
+            text-decoration: underline;
+        }
+
+        section {
+            margin: 50px 0;
+        }
+
+        section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        section h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        section h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .learning-objectives {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .learning-objectives h3 {
+            color: #1565c0;
+            margin-top: 0;
+        }
+
+        .learning-objectives ul {
+            margin-left: 20px;
+        }
+
+        .learning-objectives li {
+            margin: 8px 0;
+        }
+
+        .code-block {
+            background: #f5f5f5;
+            border-left: 4px solid #ff6b6b;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            font-family: 'Courier New', monospace;
+            color: #333;
+            margin: 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .diagram {
+            background: #f9f9f9;
+            border: 2px dashed #667eea;
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.4;
+            color: #333;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .key-point {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .key-point strong {
+            color: #856404;
+        }
+
+        .key-point ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .comparison-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .interview-question {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+
+        .interview-question h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .interview-question .question {
+            font-weight: 600;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .interview-question .answer {
+            background: white;
+            padding: 15px;
+            margin-top: 10px;
+            border-left: 3px solid #764ba2;
+            border-radius: 3px;
+        }
+
+        .interview-question .answer h5 {
+            color: #764ba2;
+            margin-bottom: 10px;
+        }
+
+        .note {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .warning {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .practice-exercise {
+            background: #f3e5f5;
+            border-left: 4px solid #9c27b0;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+
+        .practice-exercise h4 {
+            color: #6a1b9a;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            background: #f5f5f5;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #ddd;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin: 5px 5px 5px 0;
+        }
+
+        .badge.advanced {
+            background: #ff6b6b;
+        }
+
+        .badge.important {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .performance-tip {
+            background: #e0f2f1;
+            border-left: 4px solid #009688;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        p {
+            margin: 15px 0;
+        }
+
+        ul {
+            margin: 15px 0;
+        }
+
+        ol {
+            margin: 15px 0;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Week 2: Spark Core Concepts & RDD Architecture</h1>
+            <p>Complete Study Guide | L5 Interview Preparation | Hands-on Examples</p>
+        </header>
+
+        <div class="content">
+            <div class="table-of-contents">
+                <h2>📖 Table of Contents</h2>
+                <ol>
+                    <li><a href="#learning-objectives">Learning Objectives</a></li>
+                    <li><a href="#rdd-fundamentals">RDD Fundamentals</a></li>
+                    <li><a href="#transformations-actions">Transformations vs Actions</a></li>
+                    <li><a href="#partitioning">Partitioning & Parallelization</a></li>
+                    <li><a href="#shuffles">Shuffles & Wide Transformations</a></li>
+                    <li><a href="#caching">Caching & Persistence</a></li>
+                    <li><a href="#performance">Performance Optimization</a></li>
+                    <li><a href="#interview-questions">L5 Interview Questions</a></li>
+                </ol>
+            </div>
+
+            <section id="learning-objectives">
+                <h2>🎯 Learning Objectives</h2>
+                <div class="learning-objectives">
+                    <h3>By the end of Week 2, you will understand:</h3>
+                    <ul>
+                        <li><strong>RDD Architecture:</strong> Immutable distributed data structure, lineage, and DAG</li>
+                        <li><strong>Transformations vs Actions:</strong> Lazy evaluation and when code actually executes</li>
+                        <li><strong>Partitioning Strategy:</strong> How data is distributed and why it matters</li>
+                        <li><strong>Data Shuffling:</strong> Network communication patterns and performance impact</li>
+                        <li><strong>Caching & Persistence:</strong> Memory optimization and storage levels</li>
+                        <li><strong>Performance Tuning:</strong> Bottlenecks and optimization strategies</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="rdd-fundamentals">
+                <h2>🔧 RDD Fundamentals</h2>
+
+                <h3>What is an RDD?</h3>
+                <p>An <strong>RDD (Resilient Distributed Dataset)</strong> is the fundamental data structure of Apache Spark. It is an immutable, distributed collection of objects that can be processed in parallel.</p>
+
+                <div class="key-point">
+                    <strong>Key Properties of RDDs:</strong>
+                    <ul>
+                        <li><strong>Resilient:</strong> Can recover from node failure</li>
+                        <li><strong>Distributed:</strong> Data is split across multiple nodes</li>
+                        <li><strong>Immutable:</strong> Cannot be changed after creation</li>
+                        <li><strong>Lazy Evaluated:</strong> Operations are not executed immediately</li>
+                        <li><strong>Typed:</strong> Each element has a type</li>
+                    </ul>
+                </div>
+
+                <h3>RDD Lineage & DAG</h3>
+                <p>Every RDD knows how it was derived from other RDDs through lineage tracking.</p>
+
+                <div class="diagram">
+RDD Creation Lineage:
+
+    Original Data
+         │ (flatMap)
+         ▼
+    RDD1: Flattened Data
+    ┌─────────────────────┐
+    │ Partition 0: [...]  │
+    │ Partition 1: [...]  │
+    │ Partition 2: [...]  │
+    └─────────────────────┘
+         │ (filter)
+         ▼
+    RDD2: Filtered Data
+    ┌─────────────────────┐
+    │ Partition 0: [...]  │
+    │ Partition 1: [...]  │
+    │ Partition 2: [...]  │
+    └─────────────────────┘
+         │ (map)
+         ▼
+    RDD3: Mapped Data
+    ┌─────────────────────┐
+    │ Partition 0: [...]  │
+    │ Partition 1: [...]  │
+    │ Partition 2: [...]  │
+    └─────────────────────┘
+                </div>
+
+                <h3>5 Key Properties of Every RDD</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Property</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Partitions</strong></td>
+                            <td>List of partitions that the RDD is divided into</td>
+                            <td>4 partitions spread across 4 nodes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dependencies</strong></td>
+                            <td>List of parent RDDs</td>
+                            <td>rdd2 depends on rdd1</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Compute Function</strong></td>
+                            <td>How to compute the RDD from its parents</td>
+                            <td>lambda x: x * 2</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Partitioner</strong></td>
+                            <td>Metadata about partitioning scheme</td>
+                            <td>Hash partitioner</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Preferred Locations</strong></td>
+                            <td>Where partitions should be computed</td>
+                            <td>Node IP where HDFS block resides</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="transformations-actions">
+                <h2>⚡ Transformations vs Actions</h2>
+
+                <h3>Lazy Evaluation Model</h3>
+                <p>Spark uses lazy evaluation: transformations are not computed immediately. Computation happens only when an action is called.</p>
+
+                <div class="code-block">
+                    <pre>from pyspark import SparkContext
+
+sc = SparkContext("local", "Lazy Evaluation")
+
+# Transformation 1: CREATE (no execution)
+rdd1 = sc.parallelize([1, 2, 3, 4, 5])
+
+# Transformation 2: MAP (no execution)
+rdd2 = rdd1.map(lambda x: x * 2)
+
+# Transformation 3: FILTER (no execution)
+rdd3 = rdd2.filter(lambda x: x > 5)
+
+# ACTION: COLLECT (triggers execution!)
+result = rdd3.collect()
+print(result)  # [6, 8, 10]
+# NOW all transformations execute in pipeline

@@ -1,0 +1,299 @@
+================================================================================
+                    SPARK INSTALLATION SUMMARY
+                          12-Week Program
+================================================================================
+
+WHAT GETS INSTALLED & WHERE
+────────────────────────────────────────────────────────────────────────────
+
+1. HOMEBREW (Package Manager)
+   └─ Location: /usr/local/
+   └─ Size: ~100MB
+   └─ Purpose: Install Java and Spark easily
+   └─ Install time: 2-3 minutes
+
+2. JAVA JDK 11 (Spark Runtime)
+   └─ Location: /usr/local/opt/openjdk@11/
+   └─ Size: ~300MB
+   └─ Purpose: Spark runs on Java Virtual Machine
+   └─ Install time: 3-5 minutes
+   └─ Add to ~/.zprofile:
+      export JAVA_HOME=$(/usr/libexec/java_home -v 11)
+      export PATH=$JAVA_HOME/bin:$PATH
+
+3. APACHE SPARK (Distributed Compute Engine)
+   └─ Location: /usr/local/opt/apache-spark/libexec/
+   └─ Size: ~180MB
+   └─ Purpose: The actual Spark framework
+   └─ Install time: 2-3 minutes
+   └─ Add to ~/.zprofile:
+      export SPARK_HOME=/usr/local/opt/apache-spark/libexec
+      export PATH=$SPARK_HOME/bin:$PATH
+
+4. PYTHON PACKAGES (Data Science Libraries)
+   └─ Location: ~/.local/lib/python3.X/site-packages/
+   └─ Size: ~500MB
+   └─ Purpose: jupyter, pandas, numpy, pyspark, etc.
+   └─ Install time: 5-10 minutes
+   └─ Installed via: pip3 install -r requirements.txt
+
+5. PROJECT STRUCTURE (Your Learning Materials)
+   └─ Location: ~/code/spark/
+   └─ Structure: 12 weeks × 3 phases
+   └─ Each week: data/, scripts/, notebooks/, output/, config/
+   └─ Setup time: 2-3 minutes
+
+================================================================================
+
+INSTALLATION STEPS (10 TOTAL) - ESTIMATED TIME: 15-25 MINUTES
+────────────────────────────────────────────────────────────────────────────
+
+STEP 1: Install Homebrew (2-3 min)
+┌─ Command:
+│  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+├─ Verify:
+│  brew --version
+└─ Expected: Homebrew 4.x.x
+
+STEP 2: Install Java JDK 11 (3-5 min)
+┌─ Command:
+│  brew install openjdk@11
+├─ Add to ~/.zprofile:
+│  export JAVA_HOME=$(/usr/libexec/java_home -v 11)
+│  export PATH=$JAVA_HOME/bin:$PATH
+├─ Reload:
+│  source ~/.zprofile
+├─ Verify:
+│  java -version
+└─ Expected: Java 11.0.x
+
+STEP 3: Install Apache Spark (2-3 min)
+┌─ Command:
+│  brew install apache-spark
+├─ Add to ~/.zprofile:
+│  export SPARK_HOME=/usr/local/opt/apache-spark/libexec
+│  export PATH=$SPARK_HOME/bin:$PATH
+├─ Reload:
+│  source ~/.zprofile
+├─ Verify:
+│  spark-shell --version
+└─ Expected: Spark 3.5.x
+
+STEP 4: Install Python Packages (5-10 min)
+┌─ Create requirements.txt:
+│  jupyter jupyterlab pandas numpy matplotlib scipy scikit-learn pyspark
+├─ Command:
+│  pip3 install -r requirements.txt
+├─ Verify:
+│  python3 -c "import pyspark; print(pyspark.__version__)"
+└─ Expected: pyspark x.x.x
+
+STEP 5: Create Project Structure (2-3 min)
+┌─ Create directories:
+│  mkdir -p ~/code/spark/phase-{1,2,3}-{name}/{week-{1..4,5..8,9..12}}
+├─ For each week:
+│  mkdir -p data/ scripts/ notebooks/ output/ config/
+└─ Result: ~/code/spark/ ready for 12-week program
+
+STEP 6: Add Sample Data (1 min)
+┌─ Create sample.csv in week-1/data/
+├─ Columns: id, name, age, city, salary
+└─ Rows: 10 sample records
+
+STEP 7: Create Config Files (1 min)
+┌─ log4j.properties (in week-1/config/)
+└─ Purpose: Configure Spark logging
+
+STEP 8: Run First Spark Job (2 min)
+┌─ File: ~/code/spark/phase-1/week-1/scripts/01_first_job.py
+├─ Command:
+│  cd ~/code/spark/phase-1-spark-internals/week-1/scripts
+│  python3 01_first_job.py
+└─ Expected: Shows data from sample.csv + statistics
+
+STEP 9: Access Spark UI (30 sec)
+┌─ While job running:
+│  Open browser: http://localhost:4040
+├─ View: DAG, stages, tasks, executors
+└─ Purpose: Visualize job execution
+
+STEP 10: Test Jupyter (30 sec)
+┌─ Command:
+│  jupyter lab
+├─ Browser:
+│  http://localhost:8888
+└─ Purpose: Interactive notebooks for exploration
+
+================================================================================
+
+HOW IT ALL CONNECTS
+────────────────────────────────────────────────────────────────────────────
+
+Terminal Open
+    │
+    ├─ Loads ~/.zprofile
+    │  ├─ Reads: JAVA_HOME=$(...openjdk@11...)
+    │  ├─ Reads: SPARK_HOME=/usr/local/opt/apache-spark/libexec
+    │  └─ Adds to PATH
+    │
+    ├─ You run: python3 script.py
+    │  │
+    │  ├─ Python interpreter starts
+    │  │
+    │  ├─ Script creates: SparkSession.builder.getOrCreate()
+    │  │
+    │  ├─ Spark initializes:
+    │  │  ├─ Uses JAVA_HOME to find Java
+    │  │  ├─ Uses SPARK_HOME to find Spark libraries
+    │  │  ├─ Creates Driver process
+    │  │  └─ Starts Executor threads
+    │  │
+    │  ├─ Script reads: spark.read.csv("../data/sample.csv")
+    │  │  └─ Finds file relative to script location
+    │  │
+    │  ├─ Script triggers action: df.show()
+    │  │  ├─ Builds execution plan (DAG)
+    │  │  ├─ Executors process data
+    │  │  └─ Results display
+    │  │
+    │  └─ Spark UI available: http://localhost:4040
+    │
+    └─ Job completes
+
+================================================================================
+
+FILE LOCATIONS QUICK REFERENCE
+────────────────────────────────────────────────────────────────────────────
+
+System Installation:
+  Java         /usr/local/opt/openjdk@11/
+  Spark        /usr/local/opt/apache-spark/libexec/
+  Config       /usr/local/opt/apache-spark/libexec/conf/
+
+Environment:
+  Shell config ~/.zprofile          (add JAVA_HOME, SPARK_HOME)
+
+Python:
+  Site packages ~/.local/lib/python3.X/site-packages/  (pyspark, jupyter, etc)
+
+Your Project:
+  Root         ~/code/spark/
+  Phase 1      ~/code/spark/phase-1-spark-internals/
+  Phase 2      ~/code/spark/phase-2-streaming/
+  Phase 3      ~/code/spark/phase-3-system-design/
+
+Week Structure (× 12):
+  Data         week-X/data/         (CSV, JSON files)
+  Scripts      week-X/scripts/      (Python code)
+  Notebooks    week-X/notebooks/    (Jupyter)
+  Output       week-X/output/       (Results, screenshots)
+  Config       week-X/config/       (log4j.properties)
+
+================================================================================
+
+COMMANDS YOU'LL USE REGULARLY
+────────────────────────────────────────────────────────────────────────────
+
+RUNNING CODE:
+  cd ~/code/spark/phase-X/week-X/scripts
+  python3 01_script_name.py
+
+INTERACTIVE SHELL:
+  spark-shell              (Scala REPL)
+  pyspark                  (Python REPL)
+
+JUPYTER NOTEBOOKS:
+  jupyter lab              (Opens http://localhost:8888)
+
+CHECKING STATUS:
+  java -version
+  spark-shell --version
+  echo $JAVA_HOME
+  echo $SPARK_HOME
+
+MONITORING JOBS:
+  http://localhost:4040    (Open while job running)
+
+================================================================================
+
+VERIFICATION CHECKLIST
+────────────────────────────────────────────────────────────────────────────
+
+✓ Homebrew installed
+  → brew --version shows 4.x.x
+
+✓ Java JDK 11 installed
+  → java -version shows 11.0.x
+  → echo $JAVA_HOME shows path
+
+✓ Apache Spark installed
+  → spark-shell --version shows 3.5.x
+  → echo $SPARK_HOME shows path
+
+✓ Python 3.9+
+  → python3 --version shows 3.9+
+
+✓ Python packages
+  → python3 -c "import pyspark; print(pyspark.__version__)" works
+  → jupyter --version works
+
+✓ Project structure
+  → ls -la ~/code/spark/ shows directories
+
+✓ Sample data
+  → ~/code/spark/phase-1-spark-internals/week-1/data/sample.csv exists
+
+✓ First job runs
+  → python3 01_first_job.py outputs data
+
+✓ Spark UI accessible
+  → http://localhost:4040 shows job dashboard while running
+
+✓ Jupyter works
+  → jupyter lab opens http://localhost:8888
+
+================================================================================
+
+TROUBLESHOOTING QUICK REFERENCE
+────────────────────────────────────────────────────────────────────────────
+
+"command not found: java"
+  → Install: brew install openjdk@11
+  → Add JAVA_HOME to ~/.zprofile
+
+"command not found: spark-shell"
+  → Install: brew install apache-spark
+  → Add SPARK_HOME to ~/.zprofile
+
+"JAVA_HOME is not set"
+  → Edit ~/.zprofile and add: export JAVA_HOME=$(...openjdk@11...)
+  → Run: source ~/.zprofile
+
+"ModuleNotFoundError: pyspark"
+  → Install: pip3 install pyspark
+
+"Address already in use: 4040"
+  → Kill previous Spark job or wait 30 seconds
+
+================================================================================
+
+NEXT STEPS
+────────────────────────────────────────────────────────────────────────────
+
+1. Follow the 10 installation steps (15-25 minutes)
+2. Run verification checklist
+3. Start Week 1 learning materials:
+   - Read: week1_theory_spark_execution_model_dag_generation.html
+   - Code: ~/code/spark/phase-1-spark-internals/week-1/scripts/
+4. Complete 6 hands-on labs
+5. Continue with Week 2-12 materials
+
+================================================================================
+
+Questions? See: 00_SPARK_COMPLETE_SETUP_GUIDE.html (detailed step-by-step)
+Questions? See: PROJECT_STRUCTURE_REFERENCE.md (how everything connects)
+Questions? See: Spark_Setup_Overview.html (conceptual overview)
+
+================================================================================
+                          YOU'RE READY TO START!
+================================================================================
